@@ -1,0 +1,47 @@
+[
+  {
+    "intent": "stok_jersey",
+    "examples": [
+      "Cek stok jersey Persib 2025",
+      "Apakah jersey Persib tersedia?",
+      "Berapa jumlah jersey Persib yang ada?",
+      "Adakah jersey Persib yang tersisa?"
+    ]
+  },
+  {
+    "intent": "stok_scarf",
+    "examples": [
+      "Cek stok scarf Maung Bandung",
+      "Apakah scarf Persib masih ada?",
+      "Berapa banyak scarf Persib yang tersedia?",
+      "Stok scarf Maung Bandung tersisa berapa?"
+    ]
+  },
+  {
+    "intent": "stok_topi",
+    "examples": [
+      "Cek stok topi Persib",
+      "Apakah topi Persib masih ada?",
+      "Berapa jumlah topi Persib yang tersedia?",
+      "Adakah topi Persib yang tersisa?"
+    ]
+  },
+  {
+    "intent": "info_jadwal",
+    "examples": [
+      "Kapan pertandingan Persib berikutnya?",
+      "Jadwal pertandingan Persib minggu ini",
+      "Pertandingan Persib selanjutnya kapan?",
+      "Informasi jadwal Persib terbaru"
+    ]
+  },
+  {
+    "intent": "info_sejarah",
+    "examples": [
+      "Sejarah Persib Bandung",
+      "Kapan Persib didirikan?",
+      "Ceritakan sejarah Persib",
+      "Informasi tentang asal-usul Persib Bandung"
+    ]
+  }
+]
