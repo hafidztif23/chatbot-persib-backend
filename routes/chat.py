@@ -42,7 +42,7 @@ Jawab selalu dalam Bahasa Indonesia.
 Pertanyaan user: '{query}'
 """
         response = llm.invoke([HumanMessage(content=prompt)])
-        return {"intent": intent, "score": score, "response": response.strip()}
+        return {"intent": intent, "score": score, "response": response.content.strip()}
 
     # Default → RAG
     response = rag_qa.run(query)
