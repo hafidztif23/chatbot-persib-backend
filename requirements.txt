@@ -10,3 +10,8 @@ langchain-community
 langchain-huggingface
 chromadb
 huggingface-hub
+pgvector
+psycopg2-binary
+pypdf
+openpyxl
+python-docx

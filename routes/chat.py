@@ -3,8 +3,9 @@ from pydantic import BaseModel
 from langchain_classic.schema import HumanMessage
 from core.intents import detect_intent
 from core.db import check_merch_stock
-from core.rag import llm, rag_qa
-from core.memory import get_memory
+from core.rag import llm
+from core.memory import load_history, save_context, clear_history
+from core.embeddings import semantic_search
 
 router = APIRouter()
 
@@ -22,11 +23,9 @@ class QueryRequest(BaseModel):
 def chat(req: QueryRequest):
     query = req.query
     session_id = req.session_id
-    memory = get_memory(session_id)
-
     intent, score = detect_intent(query)
 
-    history = memory.load_memory_variables({}).get("chat_history", [])
+    history = load_history(session_id, limit=5)
     history_text = "\n".join(
         f"{'User' if isinstance(m, HumanMessage) else 'Asisten'}: {m.content}"
         for m in history
@@ -35,6 +34,7 @@ def chat(req: QueryRequest):
     if intent in item_map:
         item_name = item_map[intent]
         stock = check_merch_stock(item_name)
+        
         if stock is not None:
             prompt = f"""
 Kamu adalah asisten Persib Bandung yang ramah, singkat, dan natural.
@@ -64,15 +64,40 @@ Pertanyaan user: '{query}'
         answer = response.content.strip()
 
     else:
-        # RAG flow — inject history ke query
-        query_with_history = f"""Riwayat percakapan sebelumnya:
+        # Ambil context dari pgvector
+        search_results = semantic_search(query, top_k=3)
+
+        if search_results:
+            context = "\n\n".join(
+                f"[Sumber: {r['source']}]\n{r['content']}"
+                for r in search_results
+            )
+        else:
+            context = "Tidak ada informasi yang relevan ditemukan."
+
+        prompt = f"""Kamu adalah asisten Persib Bandung yang ramah dan helpful.
+Jawab selalu dalam Bahasa Indonesia, singkat, dan natural.
+Gunakan HANYA informasi dari konteks berikut untuk menjawab.
+Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
+
+Konteks:
+{context}
+
+Riwayat percakapan sebelumnya:
 {history_text}
 
-Pertanyaan sekarang: {query}""" if history_text else query
+Pertanyaan: {query}
+Jawaban:"""
 
-        answer = rag_qa.run(query_with_history)
+        response = llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content.strip()
 
-    # Simpan ke memory
-    memory.save_context({"input": query}, {"output": answer})
+    # Simpan ke PostgreSQL
+    save_context(session_id, query, answer)
 
     return {"intent": intent, "score": score, "response": answer, "session_id": session_id}
+
+@router.delete("/chat/history/{session_id}")
+def delete_history(session_id: str):
+    clear_history(session_id)
+    return {"message": f"History untuk session '{session_id}' berhasil dihapus"}
