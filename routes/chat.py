@@ -2,10 +2,11 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from langchain_classic.schema import HumanMessage
 from core.intents import detect_intent
-from core.db import check_merch_stock
+from core.db import check_merch_stock, get_jadwal_terdekat, get_jadwal_terdekat
 from core.rag import llm
 from core.memory import load_history, save_context, clear_history
 from core.embeddings import semantic_search
+
 
 router = APIRouter()
 
@@ -63,6 +64,31 @@ Pertanyaan user: '{query}'
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    elif intent == "info_jadwal":
+        jadwal = get_jadwal_terdekat()
+        if jadwal:
+            data_jadwal = f"""Pertandingan terdekat:
+- Lawan: {jadwal['lawan']}
+- Tanggal: {jadwal['tanggal_jam']}
+- Lokasi: {jadwal['lokasi']}
+- Kompetisi: {jadwal['kompetisi']}
+- Status: {jadwal['status_pertandingan']}"""
+        else:
+            data_jadwal = "Tidak ada jadwal pertandingan yang akan datang."
+        
+        prompt = f"""Kamu adalah asisten Persib Bandung yang ramah, singkat, dan natural.
+Jawab selalu dalam Bahasa Indonesia.
+Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
+
+{data_jadwal}
+
+Riwayat percakapan sebelumnya:
+{history_text}
+
+Pertanyaan user: '{query}'"""
+
+        response = llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content.strip()
     else:
         # Ambil context dari pgvector
         search_results = semantic_search(query, top_k=3)
