@@ -1,4 +1,5 @@
 import json
+import re
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -27,3 +28,19 @@ def detect_intent(user_query, threshold=0.55):
         return "general", best_score
 
     return best_intent, best_score
+
+def extract_lawan(query: str) -> str | None:
+    """Ekstrak nama klub lawan dari query user"""
+    # Hapus kata-kata umum yang bukan nama klub
+    stopwords = [
+        "pertandingan", "jadwal", "lawan", "kapan", "persib",
+        "main", "vs", "melawan", "ketemu", "bertanding", "tanding",
+        "bermain", "maen", "ari", "kalo", "kalau", "dengan", "sama",
+    ]
+    query_clean = query.lower()
+    for word in stopwords:
+        query_clean = query_clean.replace(word, "")
+
+    # Ambil kata yang tersisa dan bersihkan spasi
+    result = re.sub(r'\s+', ' ', query_clean).strip()
+    return result if result else None

@@ -27,13 +27,27 @@
     ]
   },
   {
-    "intent": "info_jadwal",
+    "intent": "info_jadwal_terdekat",
     "examples": [
       "Kapan pertandingan Persib berikutnya?",
       "Jadwal pertandingan Persib minggu ini",
       "Pertandingan Persib selanjutnya kapan?",
       "Informasi jadwal Persib terbaru",
       "Kapan Persib main lagi?"
+    ]
+  },
+  {
+    "intent": "info_jadwal",
+    "examples": [
+      "Pertandingan lawan Persija kapan?",
+      "Kapan Persib main lawan Arema?",
+      "Jadwal Persib vs Bali United",
+      "Persib ketemu Borneo FC tanggal berapa?",
+      "Kapan Persib lawan PSM?",
+      "Pertandingan melawan Dewa United kapan?",
+      "Persib vs Persijap Jepara kapan?",
+      "Jadwal Persib vs PSBS Biak kapan?",
+      "Kapan Persib main lawan Persis Solo?"
     ]
   },
   {

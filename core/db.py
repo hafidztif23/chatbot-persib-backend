@@ -81,3 +81,31 @@ def get_jadwal_terdekat():
         "kompetisi": row["kompetisi"],
         "status_pertandingan": row["status_pertandingan"]
     }
+
+def get_jadwal_by_lawan(nama_lawan: str):
+    """Cari jadwal pertandingan berdasarkan nama lawan (partial match)"""
+    with engine.connect() as conn:
+        rows = conn.execute(
+            text("""
+                SELECT id_jadwal, lawan, tanggal_jam, lokasi, kompetisi, status_pertandingan
+                FROM jadwal_pertandingan
+                WHERE LOWER(lawan) LIKE LOWER(:nama_lawan)
+                ORDER BY tanggal_jam ASC
+            """),
+            {"nama_lawan": f"%{nama_lawan}%"}
+        ).mappings().all()
+
+    if not rows:
+        return None
+
+    return [
+        {
+            "id_jadwal": row["id_jadwal"],
+            "lawan": row["lawan"],
+            "tanggal_jam": row["tanggal_jam"].strftime("%d %B %Y, %H:%M WIB"),
+            "lokasi": row["lokasi"],
+            "kompetisi": row["kompetisi"],
+            "status_pertandingan": row["status_pertandingan"]
+        }
+        for row in rows
+    ]

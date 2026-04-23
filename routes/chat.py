@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from langchain_classic.schema import HumanMessage
-from core.intents import detect_intent
-from core.db import check_merch_stock, get_jadwal_terdekat, get_jadwal_terdekat
+from core.intents import detect_intent, extract_lawan
+from core.db import check_merch_stock, get_jadwal_terdekat, get_jadwal_terdekat, get_jadwal_by_lawan
 from core.rag import llm
 from core.memory import load_history, save_context, clear_history
 from core.embeddings import semantic_search
@@ -64,7 +64,7 @@ Pertanyaan user: '{query}'
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
-    elif intent == "info_jadwal":
+    elif intent == "info_jadwal_terdekat":
         jadwal = get_jadwal_terdekat()
         if jadwal:
             data_jadwal = f"""Pertandingan terdekat:
@@ -86,6 +86,37 @@ Riwayat percakapan sebelumnya:
 {history_text}
 
 Pertanyaan user: '{query}'"""
+        
+    elif intent == "info_jadwal":
+        nama_lawan = extract_lawan(query)
+        jadwal_list = get_jadwal_by_lawan(nama_lawan) if nama_lawan else None
+
+        if jadwal_list:
+            data_jadwal = "\n".join([
+                f"""Pertandingan {idx + 1}:
+- Lawan: {j['lawan']}
+- Tanggal: {j['tanggal_jam']}
+- Lokasi: {j['lokasi']}
+- Kompetisi: {j['kompetisi']}
+- Status: {j['status_pertandingan']}"""
+                for idx, j in enumerate(jadwal_list)
+            ])
+        else:
+            data_jadwal = f"Tidak ada jadwal pertandingan melawan '{nama_lawan}' yang ditemukan."
+
+        prompt = f"""Kamu adalah asisten Persib Bandung yang ramah, singkat, dan natural.
+Jawab selalu dalam Bahasa Indonesia.
+Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
+
+{data_jadwal}
+
+Riwayat percakapan sebelumnya:
+{history_text}
+
+Pertanyaan user: '{query}'"""
+
+        response = llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content.strip()
 
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
