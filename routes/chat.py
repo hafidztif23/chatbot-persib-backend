@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from langchain_classic.schema import HumanMessage
-from core.intents import detect_intent, extract_lawan
-from core.db import check_merch_stock, get_jadwal_terdekat, get_jadwal_terdekat, get_jadwal_by_lawan
+from core.intents import detect_intent, extract_lawan, extract_nama_pemain, extract_posisi, extract_status_pemain
+from core.db import check_merch_stock, get_jadwal_terdekat, get_jadwal_terdekat, get_jadwal_by_lawan, get_pemain_by_nama, get_pemain_by_posisi, get_pemain_by_status
 from core.rag import llm
 from core.memory import load_history, save_context, clear_history
 from core.embeddings import semantic_search
@@ -87,6 +87,9 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan user: '{query}'"""
         
+        response = llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content.strip()
+        
     elif intent == "info_jadwal":
         nama_lawan = extract_lawan(query)
         jadwal_list = get_jadwal_by_lawan(nama_lawan) if nama_lawan else None
@@ -118,8 +121,87 @@ Pertanyaan user: '{query}'"""
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    elif intent == "info_pemain":
+        nama = extract_nama_pemain(query)
+        pemain = get_pemain_by_nama(nama) if nama else None
+
+        if pemain:
+            data_pemain = f"""Data pemain:
+- Nama: {pemain['nama_pemain']}
+- Nomor Punggung: {pemain['nomor_punggung']}
+- Posisi: {pemain['posisi']}
+- Kewarganegaraan: {pemain['kewarganegaraan']}
+- Tanggal Lahir: {pemain['tanggal_lahir']}
+- Status: {pemain['status']}"""
+        else:
+            data_pemain = f"Pemain dengan nama '{nama}' tidak ditemukan di skuad Persib."
+
+        prompt = f"""Kamu adalah asisten Persib Bandung yang ramah, singkat, dan natural.
+Jawab selalu dalam Bahasa Indonesia.
+Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
+
+{data_pemain}
+
+Riwayat percakapan sebelumnya:
+{history_text}
+
+Pertanyaan user: '{query}'"""
+
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
+
+    elif intent == "info_pemain_posisi":
+        posisi = extract_posisi(query)
+        pemain_list = get_pemain_by_posisi(posisi) if posisi else []
+
+        if pemain_list:
+            data_pemain = f"Daftar pemain posisi {posisi}:\n" + "\n".join(
+                f"- #{p['nomor_punggung']} {p['nama_pemain']} ({p['kewarganegaraan']})"
+                for p in pemain_list
+            )
+        else:
+            data_pemain = f"Tidak ada data pemain untuk posisi '{posisi}'."
+
+        prompt = f"""Kamu adalah asisten Persib Bandung yang ramah, singkat, dan natural.
+Jawab selalu dalam Bahasa Indonesia.
+Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
+
+{data_pemain}
+
+Riwayat percakapan sebelumnya:
+{history_text}
+
+Pertanyaan user: '{query}'"""
+
+        response = llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content.strip()
+
+    elif intent == "info_pemain_status":
+        status = extract_status_pemain(query)
+        pemain_list = get_pemain_by_status(status) if status else []
+
+        if pemain_list:
+            data_pemain = f"Daftar pemain dengan status {status}:\n" + "\n".join(
+                f"- #{p['nomor_punggung']} {p['nama_pemain']} ({p['posisi']})"
+                for p in pemain_list
+            )
+        else:
+            data_pemain = f"Tidak ada pemain dengan status '{status}'."
+
+        prompt = f"""Kamu adalah asisten Persib Bandung yang ramah, singkat, dan natural.
+Jawab selalu dalam Bahasa Indonesia.
+Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
+
+{data_pemain}
+
+Riwayat percakapan sebelumnya:
+{history_text}
+
+Pertanyaan user: '{query}'"""
+
+        response = llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content.strip()
+
     else:
         # Ambil context dari pgvector
         search_results = semantic_search(query, top_k=3)

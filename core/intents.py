@@ -44,3 +44,45 @@ def extract_lawan(query: str) -> str | None:
     # Ambil kata yang tersisa dan bersihkan spasi
     result = re.sub(r'\s+', ' ', query_clean).strip()
     return result if result else None
+
+def extract_nama_pemain(query: str) -> str | None:
+    """Ekstrak nama pemain dari query user"""
+    stopwords = [
+        "informasi", "tentang", "siapa", "itu", "profil", "pemain",
+        "persib", "data", "bernama", "ceritakan", "nomor", "punggung"
+    ]
+    query_clean = query.lower()
+    for word in stopwords:
+        query_clean = query_clean.replace(word, "")
+
+    result = re.sub(r'\s+', ' ', query_clean).strip()
+    return result if result else None
+
+def extract_posisi(query: str) -> str | None:
+    """Ekstrak posisi dari query user"""
+    posisi_map = {
+        "kiper": "Kiper",
+        "bek": "Bek",
+        "gelandang": "Gelandang",
+        "striker": "Penyerang",
+        "penyerang": "Penyerang",
+    }
+    query_lower = query.lower()
+    for keyword, posisi in posisi_map.items():
+        if keyword in query_lower:
+            return posisi
+    return None
+
+def extract_status_pemain(query: str) -> str | None:
+    """Ekstrak status pemain dari query user"""
+    status_map = {
+        "cedera": "Cedera",
+        "dipinjam": "Dipinjam",
+        "pinjam": "Dipinjam",
+        "aktif": "Aktif",
+    }
+    query_lower = query.lower()
+    for keyword, status in status_map.items():
+        if keyword in query_lower:
+            return status
+    return None

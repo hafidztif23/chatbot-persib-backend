@@ -109,3 +109,84 @@ def get_jadwal_by_lawan(nama_lawan: str):
         }
         for row in rows
     ]
+
+def get_pemain_by_nama(nama: str):
+    """Cari pemain berdasarkan nama (partial match)"""
+    with engine.connect() as conn:
+        row = conn.execute(
+            text("""
+                SELECT id_pemain, nama_pemain, nomor_punggung, posisi,
+                       kewarganegaraan, tanggal_lahir, status
+                FROM pemain
+                WHERE LOWER(nama_pemain) LIKE LOWER(:nama)
+                LIMIT 1
+            """),
+            {"nama": f"%{nama}%"}
+        ).mappings().fetchone()
+
+    if not row:
+        return None
+
+    return {
+        "id_pemain": row["id_pemain"],
+        "nama_pemain": row["nama_pemain"],
+        "nomor_punggung": row["nomor_punggung"],
+        "posisi": row["posisi"],
+        "kewarganegaraan": row["kewarganegaraan"],
+        "tanggal_lahir": row["tanggal_lahir"].strftime("%d %B %Y") if row["tanggal_lahir"] else None,
+        "status": row["status"]
+    }
+
+def get_pemain_by_posisi(posisi: str):
+    """Ambil semua pemain berdasarkan posisi"""
+    with engine.connect() as conn:
+        rows = conn.execute(
+            text("""
+                SELECT id_pemain, nama_pemain, nomor_punggung, posisi,
+                       kewarganegaraan, tanggal_lahir, status
+                FROM pemain
+                WHERE LOWER(posisi) = LOWER(:posisi)
+                AND status = 'Aktif'
+                ORDER BY nomor_punggung ASC
+            """),
+            {"posisi": posisi}
+        ).mappings().all()
+
+    return [
+        {
+            "id_pemain": row["id_pemain"],
+            "nama_pemain": row["nama_pemain"],
+            "nomor_punggung": row["nomor_punggung"],
+            "posisi": row["posisi"],
+            "kewarganegaraan": row["kewarganegaraan"],
+            "tanggal_lahir": row["tanggal_lahir"].strftime("%d %B %Y") if row["tanggal_lahir"] else None,
+            "status": row["status"]
+        }
+        for row in rows
+    ]
+
+def get_pemain_by_status(status: str):
+    """Ambil semua pemain berdasarkan status"""
+    with engine.connect() as conn:
+        rows = conn.execute(
+            text("""
+                SELECT id_pemain, nama_pemain, nomor_punggung, posisi,
+                       kewarganegaraan, status
+                FROM pemain
+                WHERE LOWER(status) = LOWER(:status)
+                ORDER BY nomor_punggung ASC
+            """),
+            {"status": status}
+        ).mappings().all()
+
+    return [
+        {
+            "id_pemain": row["id_pemain"],
+            "nama_pemain": row["nama_pemain"],
+            "nomor_punggung": row["nomor_punggung"],
+            "posisi": row["posisi"],
+            "kewarganegaraan": row["kewarganegaraan"],
+            "status": row["status"]
+        }
+        for row in rows
+    ]

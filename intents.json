@@ -58,5 +58,34 @@
       "Ceritakan sejarah Persib",
       "Informasi tentang asal-usul Persib Bandung"
     ]
+  },
+  {
+    "intent": "info_pemain",
+    "examples": [
+      "Informasi tentang Ramon Tanque",
+      "Siapa itu Beckham Putra?",
+      "Profil pemain Persib bernama Thom Haye",
+      "Ceritakan tentang Marc Klok",
+      "Data pemain Persib bernama Kakang Rudianto"
+    ]
+  },
+  {
+    "intent": "info_pemain_posisi",
+    "examples": [
+      "Siapa saja striker Persib?",
+      "Daftar kiper Persib Bandung",
+      "Pemain posisi bek di Persib siapa saja?",
+      "Gelandang Persib siapa saja?",
+      "Sebutkan penyerang Persib"
+    ]
+  },
+  {
+    "intent": "info_pemain_status",
+    "examples": [
+      "Siapa pemain Persib yang sedang cedera?",
+      "Pemain Persib yang dipinjam siapa saja?",
+      "Daftar pemain aktif Persib",
+      "Ada pemain Persib yang lagi dipinjamkan?"
+    ]
   }
 ]
