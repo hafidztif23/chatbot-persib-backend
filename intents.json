@@ -87,5 +87,78 @@
       "Daftar pemain aktif Persib",
       "Ada pemain Persib yang lagi dipinjamkan?"
     ]
+  },
+  {
+    "intent": "info_membersib",
+    "examples": [
+      "Apa itu MemberSIB?",
+      "Jelasin tentang MemberSIB",
+      "MemberSIB itu program apa?",
+      "Ceritakan tentang MemberSIB Persib"
+    ]
+  },
+  {
+    "intent": "info_passport_persib",
+    "examples": [
+      "Apa itu Passport Persib?",
+      "Jelasin tentang Passport Persib",
+      "Passport Persib itu apa?",
+      "Ceritakan tentang Passport Persib"
+    ]
+  },
+  {
+    "intent": "benefit_membersib",
+    "examples": [
+      "Benefit MemberSIB apa saja?",
+      "Keuntungan jadi anggota MemberSIB",
+      "Apa saja manfaat MemberSIB?",
+      "MemberSIB dapat apa saja?"
+    ]
+  },
+  {
+    "intent": "benefit_passport_persib",
+    "examples": [
+      "Benefit Passport Persib apa saja?",
+      "Keuntungan punya Passport Persib",
+      "Apa saja manfaat Passport Persib?",
+      "Passport Persib dapat apa saja?"
+    ]
+  },
+  {
+    "intent": "harga_keanggotaan",
+    "examples": [
+      "Harga MemberSIB berapa?",
+      "Biaya Passport Persib berapa?",
+      "Berapa harga keanggotaan Persib?",
+      "MemberSIB berapa per bulan?",
+      "Passport Persib harganya berapa?"
+    ]
+  },
+  {
+    "intent": "cara_daftar_membersib",
+    "examples": [
+      "Cara daftar MemberSIB?",
+      "Gimana cara beli MemberSIB?",
+      "Langkah-langkah daftar MemberSIB",
+      "Cara berlangganan MemberSIB"
+    ]
+  },
+  {
+    "intent": "cara_daftar_passport",
+    "examples": [
+      "Cara daftar Passport Persib?",
+      "Gimana cara beli Passport Persib?",
+      "Langkah daftar Passport Persib",
+      "Cara mendapatkan Passport Persib"
+    ]
+  },
+  {
+    "intent": "perbandingan_keanggotaan",
+    "examples": [
+      "Bedanya MemberSIB dan Passport Persib apa?",
+      "Mending MemberSIB atau Passport Persib?",
+      "Perbandingan MemberSIB vs Passport Persib",
+      "Apa perbedaan MemberSIB dengan Passport Persib?"
+    ]
   }
 ]

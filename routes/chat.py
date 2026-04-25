@@ -201,6 +201,57 @@ Pertanyaan user: '{query}'"""
 
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
+    
+    elif intent in {
+        "info_membersib",
+        "info_passport_persib", 
+        "benefit_membersib",
+        "benefit_passport_persib",
+        "harga_keanggotaan",
+        "cara_daftar_membersib",
+        "cara_daftar_passport",
+        "perbandingan_keanggotaan"
+    }:
+        # Buat query yang lebih spesifik berdasarkan intent
+        intent_query_map = {
+            "info_membersib": "MemberSIB program keanggotaan digital Persib",
+            "info_passport_persib": "Passport Persib program keanggotaan premium",
+            "benefit_membersib": "manfaat keuntungan benefit MemberSIB",
+            "benefit_passport_persib": "manfaat keuntungan benefit Passport Persib",
+            "harga_keanggotaan": "harga biaya keanggotaan MemberSIB Passport Persib",
+            "cara_daftar_membersib": "cara daftar pendaftaran MemberSIB",
+            "cara_daftar_passport": "cara daftar pendaftaran Passport Persib",
+            "perbandingan_keanggotaan": "perbedaan MemberSIB Passport Persib perbandingan"
+        }
+
+        # Gunakan query yang diperkaya untuk semantic search
+        enriched_query = intent_query_map.get(intent, query)
+        search_results = semantic_search(enriched_query, top_k=5)
+
+        if search_results:
+            context = "\n\n".join(
+                f"[Sumber: {r['source']}]\n{r['content']}"
+                for r in search_results
+            )
+        else:
+            context = "Tidak ada informasi yang relevan ditemukan."
+
+        prompt = f"""Kamu adalah asisten Persib Bandung yang ramah dan helpful.
+Jawab selalu dalam Bahasa Indonesia, singkat, dan natural.
+Gunakan HANYA informasi dari konteks berikut untuk menjawab.
+Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
+
+Konteks:
+{context}
+
+Riwayat percakapan sebelumnya:
+{history_text}
+
+Pertanyaan: {query}
+Jawaban:"""
+
+        response = llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content.strip()
 
     else:
         # Ambil context dari pgvector
