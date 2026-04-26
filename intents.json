@@ -160,5 +160,85 @@
       "Perbandingan MemberSIB vs Passport Persib",
       "Apa perbedaan MemberSIB dengan Passport Persib?"
     ]
+  },
+  {
+    "intent": "info_stadion_gbla",
+    "examples": [
+      "Ceritakan tentang stadion GBLA",
+      "Kapasitas stadion Gelora Bandung Lautan Api berapa?",
+      "Informasi umum stadion GBLA",
+      "Stadion GBLA itu seperti apa?",
+      "Berapa daya tampung stadion Persib?"
+    ]
+  },
+  {
+    "intent": "peraturan_penonton_boleh",
+    "examples": [
+      "Apa saja yang boleh dibawa ke stadion?",
+      "Boleh bawa tumbler ke stadion?",
+      "Boleh bawa bendera ke dalam stadion?",
+      "Apakah boleh membawa alat musik ke stadion?",
+      "Barang apa yang diizinkan masuk stadion?"
+    ]
+  },
+  {
+    "intent": "peraturan_penonton_dilarang",
+    "examples": [
+      "Apa yang dilarang di stadion GBLA?",
+      "Barang apa yang tidak boleh dibawa ke stadion?",
+      "Apakah boleh bawa flare ke stadion?",
+      "Larangan apa saja di stadion Persib?",
+      "Apakah boleh merokok di stadion?"
+    ]
+  },
+  {
+    "intent": "sanksi_pelanggaran",
+    "examples": [
+      "Denda bawa laser di stadion berapa?",
+      "Sanksi kalau masuk ke lapangan pertandingan?",
+      "Berapa denda kalau bawa flare?",
+      "Apa sanksi kalau melakukan kerusuhan di stadion?",
+      "Denda perekaman video pertandingan berapa?"
+    ]
+  },
+  {
+    "intent": "fasilitas_stadion",
+    "examples": [
+      "Fasilitas apa saja yang ada di stadion GBLA?",
+      "Ada toilet gak di stadion GBLA?",
+      "Fasilitas untuk penonton disabilitas di GBLA?",
+      "Apakah ada musholla di stadion GBLA?",
+      "Fasilitas medis di stadion GBLA ada gak?"
+    ]
+  },
+  {
+    "intent": "info_parkir_stadion",
+    "examples": [
+      "Parkir di stadion GBLA dimana?",
+      "Kapasitas parkir stadion GBLA berapa?",
+      "Area parkir motor di GBLA ada gak?",
+      "Parkir VIP di stadion GBLA dimana?",
+      "Gimana sistem parkir di stadion Persib?"
+    ]
+  },
+  {
+    "intent": "info_tiket_stadion",
+    "examples": [
+      "Aturan tiket masuk stadion GBLA?",
+      "Anak kecil perlu tiket gak untuk masuk stadion?",
+      "Kategori tiket di stadion GBLA apa saja?",
+      "Apakah satu tiket untuk satu orang?",
+      "Boleh masuk stadion tanpa tiket?"
+    ]
+  },
+  {
+    "intent": "info_media_stadion",
+    "examples": [
+      "Wartawan boleh foto di stadion gak?",
+      "Aturan media di stadion GBLA?",
+      "Apakah boleh live streaming pertandingan?",
+      "Gimana cara dapat akreditasi media di GBLA?",
+      "Drone boleh digunakan di stadion GBLA?"
+    ]
   }
 ]

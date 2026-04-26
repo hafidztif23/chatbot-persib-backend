@@ -9,6 +9,18 @@ import os
 
 emb_model = SentenceTransformer("all-MiniLM-L6-v2")
 
+FILE_CHUNK_CONFIG = {
+    # Dokumen pendek / ringkas → chunk kecil
+    "sejarah.txt":              {"chunk_size": 500,  "overlap": 50},
+    "harga_keanggotaan.txt":    {"chunk_size": 500,  "overlap": 50},
+    "membersib.pdf":            {"chunk_size": 600,  "overlap": 75},
+    "passport_persib.pdf":      {"chunk_size": 600,  "overlap": 75},
+
+    "regulasi_stadion_gbla_2025.pdf": {"chunk_size": 900, "overlap": 120},
+}
+
+DEFAULT_CHUNK_CONFIG = {"chunk_size": 600, "overlap": 75}
+
 def embed_text(text: str) -> list:
     return emb_model.encode(text).tolist()
 
@@ -54,7 +66,7 @@ def load_file(filepath: str) -> str:
         raise ValueError(f"Format file '{ext}' tidak didukung")
     return loaders[ext](filepath)
 
-def chunk_text(content: str, chunk_size: int = 500, overlap: int = 50) -> list:
+def chunk_text(content: str, chunk_size: int = 600, overlap: int = 75) -> list:
     chunks = []
     start = 0
     while start < len(content):
@@ -80,7 +92,14 @@ def store_embeddings_from_docs(docs_folder: str = "docs"):
             print(f"[SKIP] {file_name} gagal dibaca: {e}")
             continue
 
-        chunks = chunk_text(content)
+        config = FILE_CHUNK_CONFIG.get(file_name, DEFAULT_CHUNK_CONFIG)
+        chunks = chunk_text(
+            content,
+            chunk_size=config["chunk_size"],
+            overlap=config["overlap"]
+        )
+
+        print(f"  → chunk_size={config['chunk_size']}, overlap={config['overlap']}, total={len(chunks)} chunks")
 
         with engine.connect() as conn:
             conn.execute(

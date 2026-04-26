@@ -252,6 +252,55 @@ Jawaban:"""
 
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
+    
+    elif intent in {
+        "info_stadion_gbla",
+        "peraturan_penonton_boleh",
+        "peraturan_penonton_dilarang",
+        "sanksi_pelanggaran",
+        "fasilitas_stadion",
+        "info_parkir_stadion",
+        "info_tiket_stadion",
+        "info_media_stadion"
+    }:
+        intent_query_map = {
+            "info_stadion_gbla": "informasi umum stadion Gelora Bandung Lautan Api kapasitas",
+            "peraturan_penonton_boleh": "barang yang boleh dibawa penonton ke stadion diizinkan",
+            "peraturan_penonton_dilarang": "barang yang dilarang dibawa penonton larangan stadion",
+            "sanksi_pelanggaran": "denda sanksi pelanggaran stadion GBLA",
+            "fasilitas_stadion": "fasilitas stadion GBLA toilet musholla medis disabilitas",
+            "info_parkir_stadion": "area parkir stadion GBLA kapasitas motor mobil bus",
+            "info_tiket_stadion": "aturan tiket masuk stadion penonton anak-anak kategori",
+            "info_media_stadion": "aturan media wartawan fotografer akreditasi drone stadion"
+        }
+
+        enriched_query = intent_query_map.get(intent, query)
+        search_results = semantic_search(enriched_query, top_k=7)
+
+        if search_results:
+            context = "\n\n".join(
+                f"[Sumber: {r['source']}]\n{r['content']}"
+                for r in search_results
+            )
+        else:
+            context = "Tidak ada informasi yang relevan ditemukan."
+
+        prompt = f"""Kamu adalah asisten Persib Bandung yang ramah dan helpful.
+Jawab selalu dalam Bahasa Indonesia, singkat, dan natural.
+Gunakan HANYA informasi dari konteks berikut untuk menjawab.
+Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
+
+Konteks:
+{context}
+
+Riwayat percakapan sebelumnya:
+{history_text}
+
+Pertanyaan: {query}
+Jawaban:"""
+
+        response = llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content.strip()
 
     else:
         # Ambil context dari pgvector
