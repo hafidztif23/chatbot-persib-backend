@@ -15,3 +15,5 @@ psycopg2-binary
 pypdf
 openpyxl
 python-docx
+httpx
+watchdog

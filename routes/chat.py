@@ -2,11 +2,17 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from langchain_classic.schema import HumanMessage
 from core.intents import detect_intent, extract_lawan, extract_nama_pemain, extract_posisi, extract_status_pemain
-from core.db import check_merch_stock, get_jadwal_terdekat, get_jadwal_terdekat, get_jadwal_by_lawan, get_pemain_by_nama, get_pemain_by_posisi, get_pemain_by_status
 from core.rag import llm
 from core.memory import load_history, save_context, clear_history
-from core.embeddings import semantic_search
-
+from core.api_client import (
+    get_merch_stock,
+    get_jadwal_terdekat,
+    get_jadwal_by_lawan,
+    get_pemain_by_nama,
+    get_pemain_by_posisi,
+    get_pemain_by_status,
+    semantic_search_api
+)
 
 router = APIRouter()
 
@@ -34,7 +40,7 @@ def chat(req: QueryRequest):
 
     if intent in item_map:
         item_name = item_map[intent]
-        stock = check_merch_stock(item_name)
+        stock = get_merch_stock(item_name)
         
         if stock is not None:
             prompt = f"""
@@ -212,7 +218,6 @@ Pertanyaan user: '{query}'"""
         "cara_daftar_passport",
         "perbandingan_keanggotaan"
     }:
-        # Buat query yang lebih spesifik berdasarkan intent
         intent_query_map = {
             "info_membersib": "MemberSIB program keanggotaan digital Persib",
             "info_passport_persib": "Passport Persib program keanggotaan premium",
@@ -226,7 +231,7 @@ Pertanyaan user: '{query}'"""
 
         # Gunakan query yang diperkaya untuk semantic search
         enriched_query = intent_query_map.get(intent, query)
-        search_results = semantic_search(enriched_query, top_k=5)
+        search_results = semantic_search_api(enriched_query, top_k=5)
 
         if search_results:
             context = "\n\n".join(
@@ -275,7 +280,7 @@ Jawaban:"""
         }
 
         enriched_query = intent_query_map.get(intent, query)
-        search_results = semantic_search(enriched_query, top_k=7)
+        search_results = semantic_search_api(enriched_query, top_k=7)
 
         if search_results:
             context = "\n\n".join(
@@ -303,8 +308,7 @@ Jawaban:"""
         answer = response.content.strip()
 
     else:
-        # Ambil context dari pgvector
-        search_results = semantic_search(query, top_k=3)
+        search_results = semantic_search_api(query, top_k=3)
 
         if search_results:
             context = "\n\n".join(
@@ -331,7 +335,6 @@ Jawaban:"""
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
-    # Simpan ke PostgreSQL
     save_context(session_id, query, answer)
 
     return {"intent": intent, "score": score, "response": answer, "session_id": session_id}
