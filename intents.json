@@ -1,11 +1,119 @@
 [
   {
+    "intent": "greeting",
+    "examples": [
+      "Halo",
+      "Hai",
+      "Selamat pagi",
+      "Selamat siang",
+      "Selamat malam",
+      "Apa kabar?",
+      "Salam kenal",
+      "Assalamualaikum",
+      "Hi, MaungBot!",
+      "Sapa dong, Persib!",
+      "Halo, Pangeran Biru!"
+    ]
+  },
+  {
+    "intent": "farewell",
+    "examples": [
+      "Sampai jumpa",
+      "Selamat tinggal",
+      "Dadah",
+      "Sampai nanti",
+      "Sampai bertemu lagi",
+      "Sampai jumpa lagi, MaungBot!",
+      "Dadah, Persib!",
+      "Sampai nanti, Pangeran Biru!"
+    ]
+  },
+  {
+    "intent": "thanks",
+    "examples": [
+      "Terima kasih",
+      "Makasih",
+      "Thanks",
+      "Thank you",
+      "Matur nuwun",
+      "Terima kasih, MaungBot!",
+      "Makasih, Persib!",
+      "Thanks, Pangeran Biru!"
+    ]
+  },
+  {
+    "intent": "tentang_chatbot",
+    "examples": [
+      "Kamu siapa?",
+      "Ini chatbot apa?",
+      "Apa yang bisa kamu lakukan?",
+      "Kamu bisa bantu apa saja?",
+      "Fitur apa saja yang ada di sini?",
+      "Chatbot ini untuk apa?"
+    ]
+  },
+  {
+    "intent": "bantuan",
+    "examples": [
+      "Bantuan",
+      "Help",
+      "Tolong",
+      "Aku bingung",
+      "Gimana cara pakainya?",
+      "Aku tidak mengerti",
+      "Cara menggunakan chatbot ini gimana?"
+    ]
+  },
+  {
+    "intent": "konfirmasi_positif",
+    "examples": [
+      "Iya",
+      "Ya",
+      "Betul",
+      "Benar",
+      "Oke",
+      "Oke sip",
+      "Yap",
+      "Tentu",
+      "Siap",
+      "Paham"
+    ]
+  },
+  {
+    "intent": "konfirmasi_negatif",
+    "examples": [
+      "Tidak",
+      "Bukan",
+      "Salah",
+      "Nggak",
+      "Ngga",
+      "Bukan itu",
+      "Bukan yang itu"
+    ]
+  },
+  {
     "intent": "stok_jersey",
     "examples": [
       "Cek stok jersey Persib 2025",
       "Apakah jersey Persib tersedia?",
       "Berapa jumlah jersey Persib yang ada?",
-      "Adakah jersey Persib yang tersisa?"
+      "Adakah jersey Persib yang tersisa?",
+      "Jersey Persib ukuran L masih ada ga?",
+      "Min, jersey terbaru Persib ready stock?",
+      "Mau beli jersey Persib, stoknya aman?",
+      "Jersey home Persib tahun ini masih sisa berapa?",
+      "Info ketersediaan jersey away Persib dong",
+      "Masih ada stok baju Persib yang original?",
+      "Jersey kiper Persib ready nggak ukurannya?",
+      "Tolong cekin stok jersey Persib dong min",
+      "Baju Persib musim ini stoknya habis ya?",
+      "Sisa berapa jersey Persib di store sekarang?",
+      "Jersey 3rd Persib masih bisa diorder ga?",
+      "Ketersediaan jersey Pangeran Biru dong min",
+      "Baju bola Persib ukuran XL ready?",
+      "Update stok jersey Persib terbaru dong",
+      "Mau tanya jersey Persib masih ready nggak barangnya?",
+      "Jersey Persib ori masih sisa banyak ga?"
     ]
   },
   {
@@ -14,7 +122,23 @@
       "Cek stok scarf Maung Bandung",
       "Apakah scarf Persib masih ada?",
       "Berapa banyak scarf Persib yang tersedia?",
-      "Stok scarf Maung Bandung tersisa berapa?"
+      "Stok scarf Maung Bandung tersisa berapa?",
+      "Syal Persib ready stock ga min?",
+      "Scarf rajut Persib masih ada nggak?",
+      "Min, syal Maung Bandung sisa berapa?",
+      "Info stok syal Persib terbaru dong",
+      "Mau beli scarf Persib, masih ada barangnya?",
+      "Ketersediaan scarf Persib di store gimana?",
+      "Syal tulisan Persib Bandung ready ga?",
+      "Cekin stok scarf suporter Persib dong",
+      "Scarf Persib yang warna biru masih sisa?",
+      "Sisa berapa pcs scarf Persib sekarang?",
+      "Mau tanya syal Persib stoknya aman?",
+      "Scarf Pangeran Biru masih bisa dibeli?",
+      "Ada stok syal Persib yang baru ga?",
+      "Update ketersediaan scarf Maung Bandung",
+      "Scarf Persib ori masih ada di toko?",
+      "Barang scarf Persib ready atau kosong min?"
     ]
   },
   {
@@ -23,7 +147,23 @@
       "Cek stok topi Persib",
       "Apakah topi Persib masih ada?",
       "Berapa jumlah topi Persib yang tersedia?",
-      "Adakah topi Persib yang tersisa?"
+      "Adakah topi Persib yang tersisa?",
+      "Topi Persib ori ready stock ga min?",
+      "Min, topi snapback Persib sisa berapa?",
+      "Info stok topi Maung Bandung dong",
+      "Mau beli topi Persib, masih ada barangnya?",
+      "Ketersediaan topi Persib di store gimana?",
+      "Topi bucket Persib ready ga?",
+      "Cekin stok topi suporter Persib dong min",
+      "Topi Persib yang warna biru masih sisa?",
+      "Sisa berapa pcs topi Persib sekarang?",
+      "Mau tanya topi Persib stoknya aman?",
+      "Topi Pangeran Biru masih bisa diorder?",
+      "Ada stok topi Persib model baru ga?",
+      "Update ketersediaan topi Persib dong",
+      "Topi Persib original masih ada di toko?",
+      "Kupluk atau beanie Persib ready atau kosong min?",
+      "Stok topi baseball Persib masih ada?"
     ]
   },
   {
@@ -33,7 +173,22 @@
       "Jadwal pertandingan Persib minggu ini",
       "Pertandingan Persib selanjutnya kapan?",
       "Informasi jadwal Persib terbaru",
-      "Kapan Persib main lagi?"
+      "Kapan Persib main lagi?",
+      "Match Persib terdekat tanggal berapa?",
+      "Persib main hari apa minggu ini?",
+      "Jadwal Maung Bandung selanjutnya dong",
+      "Kapan laga Persib selanjutnya digelar?",
+      "Info dong Persib tanding lagi kapan?",
+      "Pertandingan terdekat Persib jam berapa min?",
+      "Jadwal tanding Persib paling baru dong",
+      "Persib ntar main kapan lagi ya?",
+      "Laga terdekat Pangeran Biru hari apa?",
+      "Update jadwal main Persib terdekat min",
+      "Kapan Persib merumput lagi?",
+      "Jadwal kickoff Persib selanjutnya jam berapa?",
+      "Matchday Persib terdekat kapan min?",
+      "Info laga lanjutan Persib dong",
+      "Hari apa Persib tanding lagi?"
     ]
   },
   {
@@ -47,7 +202,18 @@
       "Pertandingan melawan Dewa United kapan?",
       "Persib vs Persijap Jepara kapan?",
       "Jadwal Persib vs PSBS Biak kapan?",
-      "Kapan Persib main lawan Persis Solo?"
+      "Kapan Persib main lawan Persis Solo?",
+      "Info jadwal El Clasico Persib vs Persija dong",
+      "Persib tandang ke markas Persebaya kapan min?",
+      "Laga home Persib vs Madura United tanggal berapa?",
+      "Jam berapa kickoff Persib vs PSIM Yogyakarta?",
+      "Jadwal Pangeran Biru lawan Malut United dong",
+      "Persib vs Persik Kediri main hari apa?",
+      "Kapan jadwal Persib menjamu Persita?",
+      "Pertandingan Persib away lawan Barito Putera kapan?",
+      "Jadwal lengkap Persib putaran kedua mana min?",
+      "Persib vs Semen Padang tanding tanggal berapa?",
+      "Mau tau jadwal Persib lawan Bhayangkara FC dong"
     ]
   },
   {

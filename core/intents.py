@@ -31,19 +31,24 @@ def detect_intent(user_query, threshold=0.55):
 
 def extract_lawan(query: str) -> str | None:
     """Ekstrak nama klub lawan dari query user"""
-    # Hapus kata-kata umum yang bukan nama klub
+    query_clean = re.sub(r'[^\w\s]', ' ', query.lower())
+
     stopwords = [
+        # Kata dasar bawaan
         "pertandingan", "jadwal", "lawan", "kapan", "persib",
         "main", "vs", "melawan", "ketemu", "bertanding", "tanding",
         "bermain", "maen", "ari", "kalo", "kalau", "dengan", "sama",
+        "tanggal", "berapa", "info", "el clasico", "dong", "min",
+        "tandang", "ke", "markas", "laga", "home", "jam", "kickoff",
+        "pangeran biru", "maung bandung", "menjamu", "away", "lengkap",
+        "putaran", "kedua", "mana", "mau", "tau", "hari", "apa", "ya"
     ]
-    query_clean = query.lower()
-    for word in stopwords:
-        query_clean = query_clean.replace(word, "")
 
-    # Ambil kata yang tersisa dan bersihkan spasi
+    for word in stopwords:
+        query_clean = re.sub(rf'\b{word}\b', ' ', query_clean)
+
     result = re.sub(r'\s+', ' ', query_clean).strip()
-    return result if result else None
+    return result.title() if result else None
 
 def extract_nama_pemain(query: str) -> str | None:
     """Ekstrak nama pemain dari query user"""
