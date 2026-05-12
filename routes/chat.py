@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from langchain_classic.schema import HumanMessage
-from core.config import CHATBOT_NAME
+from core.config import CHATBOT_NAME, LANGUAGE_INSTRUCTION
 from core.intents import detect_intent, extract_lawan, extract_nama_pemain, extract_posisi, extract_status_pemain
 from core.rag import llm
 from core.memory import load_history, save_context, clear_history
@@ -54,7 +54,7 @@ Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, d
 Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
 Data: Merchandise {item_name}, Stok saat ini: {stock} pcs.
 Jawaban harus ramah dan langsung memberikan jumlah stok.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 
 Riwayat percakapan sebelumnya:
 {history_text}
@@ -66,7 +66,7 @@ Pertanyaan user: '{query}'
 Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
 Data: Merchandise {item_name} tidak tersedia.
 Jawaban harus ramah dan beri tahu user bahwa merchandise tidak ditemukan.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 
 Riwayat percakapan sebelumnya:
 {history_text}
@@ -89,7 +89,7 @@ Pertanyaan user: '{query}'
             data_jadwal = "Tidak ada jadwal pertandingan yang akan datang."
         
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
 
 {data_jadwal}
@@ -120,7 +120,7 @@ Pertanyaan user: '{query}'"""
             data_jadwal = f"Tidak ada jadwal pertandingan melawan '{nama_lawan}' yang ditemukan."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
 
 {data_jadwal}
@@ -149,7 +149,7 @@ Pertanyaan user: '{query}'"""
             data_pemain = f"Pemain dengan nama '{nama}' tidak ditemukan di skuad Persib."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
 
 {data_pemain}
@@ -175,7 +175,7 @@ Pertanyaan user: '{query}'"""
             data_pemain = f"Tidak ada data pemain untuk posisi '{posisi}'."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
 
 {data_pemain}
@@ -201,7 +201,7 @@ Pertanyaan user: '{query}'"""
             data_pemain = f"Tidak ada pemain dengan status '{status}'."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
 
 {data_pemain}
@@ -248,7 +248,7 @@ Pertanyaan user: '{query}'"""
             context = "Tidak ada informasi yang relevan ditemukan."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
-Jawab selalu dalam Bahasa Indonesia, singkat, dan natural.
+{LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
 
@@ -297,7 +297,7 @@ Jawaban:"""
             context = "Tidak ada informasi yang relevan ditemukan."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
-Jawab selalu dalam Bahasa Indonesia, singkat, dan natural.
+{LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
 
@@ -316,7 +316,7 @@ Jawaban:"""
     elif intent == "greeting":
         if is_first_message(session_id):
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 Ini adalah pertama kali user menyapa. Perkenalkan dirimu dengan hangat dan sebutkan
 bahwa kamu bisa membantu informasi seputar Persib Bandung seperti jadwal pertandingan,
 data pemain, stok merchandise, keanggotaan, dan informasi stadion GBLA.
@@ -324,7 +324,7 @@ data pemain, stok merchandise, keanggotaan, dan informasi stadion GBLA.
 Pertanyaan user: '{query}'"""
         else:
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 User menyapa kembali. Balas sapaannya dengan hangat dan singkat tanpa perlu memperkenalkan diri lagi.
 Tanyakan apa yang bisa kamu bantu.
 
@@ -335,7 +335,7 @@ Pertanyaan user: '{query}'"""
 
     elif intent == "farewell":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 Balas perpisahan atau ucapan terima kasih dari user dengan hangat dan sopan tanpa perlu memperkenalkan diri.
 Sampaikan bahwa kamu siap membantu kapan saja jika user butuh informasi tentang Persib lagi.
 
@@ -347,7 +347,7 @@ Pertanyaan user: '{query}'"""
     elif intent == "tentang_chatbot":
         if is_first_message(session_id):
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 Perkenalkan dirimu dan jelaskan hal-hal yang bisa kamu bantu, yaitu:
 - Informasi jadwal pertandingan Persib
 - Data dan profil pemain Persib
@@ -361,7 +361,7 @@ Sampaikan dengan ramah, singkat, dan natural.
 Pertanyaan user: '{query}'"""
         else:
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 User bertanya tentang kemampuanmu. Jelaskan hal-hal yang bisa kamu bantu tanpa perlu memperkenalkan diri lagi, yaitu:
 - Informasi jadwal pertandingan Persib
 - Data dan profil pemain Persib
@@ -379,7 +379,7 @@ Pertanyaan user: '{query}'"""
     
     elif intent == "bantuan":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 {'Perkenalkan dirimu singkat lalu jelaskan' if is_first_message(session_id) else 'Jelaskan'} cara menggunakan chatbot ini dengan ramah dan mudah dipahami.
 Berikan contoh pertanyaan yang bisa diajukan seperti:
 - "Kapan Persib main lagi?"
@@ -395,7 +395,7 @@ Pertanyaan user: '{query}'"""
     
     elif intent == "thanks":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME} yang ramah.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 Balas ucapan terima kasih dari user dengan hangat dan sopan tanpa perlu memperkenalkan diri.
 Sampaikan bahwa kamu senang bisa membantu dan siap membantu kapan saja jika user butuh informasi tentang Persib lagi.
 
@@ -406,7 +406,7 @@ Pertanyaan user: '{query}'"""
 
     elif intent == "konfirmasi_positif":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 User memberikan konfirmasi positif. Respons dengan singkat dan tanyakan apakah ada hal lain yang bisa dibantu.
 Jangan memperkenalkan diri.
 
@@ -420,7 +420,7 @@ Pertanyaan user: '{query}'"""
 
     elif intent == "konfirmasi_negatif":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
-Jawab selalu dalam Bahasa Indonesia.
+{LANGUAGE_INSTRUCTION}
 User memberikan konfirmasi negatif atau menyatakan informasi yang diberikan kurang tepat.
 Minta maaf dengan singkat dan tawarkan untuk mencoba pertanyaan dengan cara yang berbeda.
 Jangan memperkenalkan diri.
@@ -445,7 +445,7 @@ Pertanyaan user: '{query}'"""
             context = "Tidak ada informasi yang relevan ditemukan."
 
         prompt = f"""Kamu adalah asisten Persib Bandung yang ramah dan helpful.
-Jawab selalu dalam Bahasa Indonesia, singkat, dan natural.
+{LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
 
