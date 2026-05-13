@@ -56,11 +56,15 @@ def validate_status(status: str):
 @router.get("/pemain")
 def get_all_pemain(
     posisi: Optional[str] = Query(None, description="Filter: Kiper, Bek, Gelandang, Penyerang"),
-    status: Optional[str] = Query(None, description="Filter: Aktif, Cedera, Dipinjam")
+    status: Optional[str] = Query(None, description="Filter: Aktif, Cedera, Dipinjam"),
+    nama: Optional[str] = Query(None)
 ):
     query = "SELECT * FROM pemain WHERE 1=1"
     params = {}
 
+    if nama:
+        query += " AND LOWER(nama_pemain) LIKE LOWER(:nama)"
+        params["nama"] = f"%{nama}%"
     if posisi:
         query += " AND LOWER(posisi) = LOWER(:posisi)"
         params["posisi"] = posisi
