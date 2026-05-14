@@ -15,6 +15,7 @@ FILE_CHUNK_CONFIG = {
     "harga_keanggotaan.txt":    {"chunk_size": 500,  "overlap": 50},
     "membersib.pdf":            {"chunk_size": 600,  "overlap": 75},
     "passport_persib.pdf":      {"chunk_size": 600,  "overlap": 75},
+    "sejarah.pdf":              {"chunk_size": 800,  "overlap": 100},
 
     "regulasi_stadion_gbla_2025.pdf": {"chunk_size": 900, "overlap": 120},
 }

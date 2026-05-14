@@ -215,6 +215,56 @@ Pertanyaan user: '{query}'"""
         answer = response.content.strip()
     
     elif intent in {
+        "info_sejarah",
+        "info_sejarah_awal",
+        "info_sejarah_era_perserikatan",
+        "info_sejarah_era_liga_indonesia",
+        "info_sejarah_era_liga_super",
+        "info_sejarah_era_liga1",
+        "info_prestasi_juara",
+        "info_pemain_legenda"
+    }:
+        intent_query_map = {
+            "info_sejarah": "sejarah umum Persib Bandung asal-usul berdiri",
+            "info_sejarah_awal": "BIVB asal-usul berdiri Persib 1919 1933 pendiri ketua",
+            "info_sejarah_era_perserikatan": "Persib era Perserikatan juara 1937 1961 1986 1994 pemain pelatih",
+            "info_sejarah_era_liga_indonesia": "Persib Liga Indonesia 1994 1995 juara Piala Champions Asia",
+            "info_sejarah_era_liga_super": "Persib Liga Super Indonesia LSI 2014 juara final Persipura",
+            "info_sejarah_era_liga1": "Persib Liga 1 juara 2023 2024 2025 Bojan Hodak David da Silva",
+            "info_prestasi_juara": "gelar juara Persib trofi prestasi kompetisi liga piala",
+            "info_pemain_legenda": "pemain legenda bersejarah Persib Robby Darwis Adjat Sudradjat Djadjang",
+        }
+
+        enriched_query = intent_query_map.get(intent, query)
+        search_results = semantic_search_api(enriched_query, top_k=6)
+
+        if search_results:
+            context = "\n\n".join(
+                f"[Sumber: {r['source']}]\n{r['content']}"
+                for r in search_results
+            )
+        else:
+            context = "Tidak ada informasi yang relevan ditemukan."
+
+        prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
+{LANGUAGE_INSTRUCTION}
+Gunakan HANYA informasi dari konteks berikut untuk menjawab.
+Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
+Sampaikan dengan gaya bercerita yang menarik, tidak sekadar menyebutkan fakta kering.
+
+Konteks:
+{context}
+
+Riwayat percakapan sebelumnya:
+{history_text}
+ 
+Pertanyaan: {query}
+Jawaban:"""
+        
+        response = llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content.strip()
+    
+    elif intent in {
         "info_membersib",
         "info_passport_persib", 
         "benefit_membersib",

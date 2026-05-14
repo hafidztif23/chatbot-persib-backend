@@ -4,6 +4,8 @@ import threading
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from core.embeddings import embed_single_file, remove_tracker
+from core.db import engine
+from sqlalchemy import text
 
 SUPPORTED_EXT = {".txt", ".pdf", ".xlsx", ".xls", ".docx"}
 
@@ -34,6 +36,12 @@ class DocsEventHandler(FileSystemEventHandler):
         if event.is_directory or not self._is_supported(event.src_path):
             return
         file_name = os.path.basename(event.src_path)
+        with engine.connect() as conn:
+            conn.execute(
+                text("DELETE FROM document_embeddings WHERE source_file = :file_name"),
+                {"file_name": file_name}
+            )
+            conn.commit()
         print(f"[WATCHER] File dihapus: {file_name}")
         remove_tracker(file_name)
 
