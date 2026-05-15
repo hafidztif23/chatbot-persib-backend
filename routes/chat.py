@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from langchain_classic.schema import HumanMessage
 from core.config import CHATBOT_NAME, LANGUAGE_INSTRUCTION
-from core.intents import detect_intent, extract_lawan, extract_nama_pemain, extract_posisi, extract_status_pemain
+from core.intents import detect_intent, extract_lawan, extract_nama_pemain, extract_posisi, extract_status_pemain, extract_tribun
 from core.rag import llm
 from core.memory import load_history, save_context, clear_history
 from core.api_client import (
@@ -12,7 +12,9 @@ from core.api_client import (
     get_pemain_by_nama,
     get_pemain_by_posisi,
     get_pemain_by_status,
-    semantic_search_api
+    semantic_search_api,
+    get_stok_tiket_terdekat,
+    get_stok_tiket_by_lawan
 )
 
 router = APIRouter()
@@ -76,6 +78,141 @@ Pertanyaan user: '{query}'
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    elif intent == "stok_tiket":
+        nama_tribun = extract_tribun(query)
+        data = get_stok_tiket_terdekat()
+
+        if data and "tribun" in data:
+            if nama_tribun:
+                # Filter ke tribun spesifik yang diminta user
+                tribun_filter = [
+                    t for t in data["tribun"]
+                    if t["nama_tribun"] == nama_tribun
+                ]
+                if tribun_filter:
+                    detail_tribun = f"- {tribun_filter[0]['nama_tribun']}: {tribun_filter[0]['stok']:,} tiket"
+                else:
+                    detail_tribun = f"Data tribun '{nama_tribun}' tidak ditemukan."
+            else:
+                # Tampilkan semua tribun
+                detail_tribun = "\n".join(
+                    f"- {t['nama_tribun']}: {t['stok']:,} tiket"
+                    for t in data["tribun"]
+                )
+
+            konteks = f"""Informasi stok tiket pertandingan terdekat:
+Lawan: {data['lawan']}
+Tanggal: {data['tanggal_jam']}
+Status: {data['status_pertandingan']}
+Stok tiket{f' tribun {nama_tribun}' if nama_tribun else ' per tribun'}:
+{detail_tribun}
+{f"Total stok semua tribun: {data['total_stok']:,} tiket" if not nama_tribun else ""}"""
+
+        else:
+            konteks = "Tidak ada data stok tiket untuk pertandingan yang akan datang."
+
+        prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
+{LANGUAGE_INSTRUCTION}
+Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
+
+{konteks}
+
+Riwayat percakapan sebelumnya:
+{history_text}
+
+Pertanyaan user: '{query}'"""
+
+        response = llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content.strip()
+
+    elif intent == "stok_tiket_by_jadwal":
+        nama_lawan = extract_lawan(query)
+        nama_tribun = extract_tribun(query)
+        data = get_stok_tiket_by_lawan(nama_lawan) if nama_lawan else None
+
+        if data and "tribun" in data:
+            if nama_tribun:
+                tribun_filter = [
+                    t for t in data["tribun"]
+                    if t["nama_tribun"] == nama_tribun
+                ]
+                if tribun_filter:
+                    detail_tribun = f"- {tribun_filter[0]['nama_tribun']}: {tribun_filter[0]['stok']:,} tiket"
+                else:
+                    detail_tribun = f"Data tribun '{nama_tribun}' tidak ditemukan."
+            else:
+                detail_tribun = "\n".join(
+                    f"- {t['nama_tribun']}: {t['stok']:,} tiket"
+                    for t in data["tribun"]
+                )
+
+            konteks = f"""Informasi stok tiket pertandingan Persib vs {data['lawan']}:
+Tanggal: {data['tanggal_jam']}
+Status: {data['status_pertandingan']}
+Stok tiket{f' tribun {nama_tribun}' if nama_tribun else ' per tribun'}:
+{detail_tribun}
+{f"Total stok semua tribun: {data['total_stok']:,} tiket" if not nama_tribun else ""}"""
+
+        else:
+            konteks = f"Tidak ada data stok tiket untuk pertandingan melawan '{nama_lawan}'."
+
+        prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
+{LANGUAGE_INSTRUCTION}
+Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
+
+{konteks}
+
+Riwayat percakapan sebelumnya:
+{history_text}
+
+Pertanyaan user: '{query}'"""
+
+        response = llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content.strip()
+
+    elif intent in {
+        "cara_beli_tiket",
+        "kebijakan_pembatalan_tiket",
+        "kebijakan_data_pembeli",
+        "kebijakan_evoucher",
+        "kebijakan_privasi"
+    }:
+        intent_query_map = {
+            "cara_beli_tiket": "cara beli tiket Persib jalur resmi aplikasi website",
+            "kebijakan_pembatalan_tiket": "pembatalan tiket refund pengembalian uang potongan administrasi",
+            "kebijakan_data_pembeli": "data pembeli NIK nama email nomor handphone tidak bisa diubah",
+            "kebijakan_evoucher": "e-voucher barcode gelang penanda penukaran tiket elektronik",
+            "kebijakan_privasi": "kebijakan privasi data konsumen penggunaan data keamanan kontak"
+        }
+
+        enriched_query = intent_query_map.get(intent, query)
+        search_results = semantic_search_api(enriched_query, top_k=5)
+
+        if search_results:
+            context = "\n\n".join(
+                f"[Sumber: {r['source']}]\n{r['content']}"
+                for r in search_results
+            )
+        else:
+            context = "Tidak ada informasi yang relevan ditemukan."
+
+        prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
+{LANGUAGE_INSTRUCTION}
+Gunakan HANYA informasi dari konteks berikut untuk menjawab.
+Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
+
+Konteks:
+{context}
+
+Riwayat percakapan sebelumnya:
+{history_text}
+
+Pertanyaan: {query}
+Jawaban:"""
+
+        response = llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content.strip()
+    
     elif intent == "info_jadwal_terdekat":
         jadwal = get_jadwal_terdekat()
         if jadwal:

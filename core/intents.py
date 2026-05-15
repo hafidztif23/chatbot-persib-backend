@@ -91,3 +91,24 @@ def extract_status_pemain(query: str) -> str | None:
         if keyword in query_lower:
             return status
     return None
+
+def extract_tribun(query: str) -> str | None:
+    """Ekstrak nama tribun dari query user"""
+    tribun_map = {
+        "timur": "Timur",
+        "selatan": "Selatan",
+        "utara": "Utara",
+        "vip barat utara": "VIP Barat Utara",
+        "vip barat selatan": "VIP Barat Selatan",
+        "vip bawah": "VIP Bawah",
+        "vip": None,  # terlalu ambigu, tidak dipilih salah satu
+    }
+
+    query_lower = query.lower()
+
+    # Cek keyword multi-kata dulu sebelum yang single
+    for keyword, tribun in tribun_map.items():
+        if keyword in query_lower:
+            return tribun
+
+    return None

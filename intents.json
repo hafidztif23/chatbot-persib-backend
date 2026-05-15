@@ -218,6 +218,66 @@
     ]
   },
   {
+    "intent": "stok_tiket",
+    "examples": [
+      "Sisa tiket pertandingan Persib masih berapa?",
+      "Stok tiket tribun timur Persib masih ada?",
+      "Tiket VIP Persib masih tersedia tidak?",
+      "Berapa sisa tiket buat nonton Persib?",
+      "Cek dong stok tiket pertandingan Persib terdekat"
+    ]
+  },
+  {
+    "intent": "cara_beli_tiket",
+    "examples": [
+      "Beli tiket Persib di mana?",
+      "Cara beli tiket nonton Persib gimana?",
+      "Tiket Persib bisa dibeli lewat aplikasi apa?",
+      "Dimana beli tiket resmi Persib Bandung?",
+      "Mau beli tiket Persib, caranya gimana ya?"
+    ]
+  },
+  {
+    "intent": "kebijakan_pembatalan_tiket",
+    "examples": [
+      "Tiket Persib yang sudah dibeli bisa dikembalikan?",
+      "Gimana cara refund tiket Persib?",
+      "Kalau batal beli tiket Persib, uangnya balik tidak?",
+      "Berapa potongan kalau cancel tiket Persib?",
+      "Tiket Persib bisa di-cancel setelah bayar?"
+    ]
+  },
+  {
+    "intent": "kebijakan_data_pembeli",
+    "examples": [
+      "Data apa saja yang perlu diisi saat beli tiket Persib?",
+      "Apakah NIK wajib diisi saat beli tiket Persib?",
+      "Bisa tidak ganti nama setelah beli tiket Persib?",
+      "Data pembeli tiket Persib bisa diubah setelah konfirmasi?",
+      "Kenapa harus pakai nomor WhatsApp aktif buat beli tiket Persib?"
+    ]
+  },
+  {
+    "intent": "kebijakan_evoucher",
+    "examples": [
+      "E-voucher tiket Persib perlu di-print tidak?",
+      "Gimana cara tukar e-voucher tiket Persib?",
+      "Gelang penanda Persib itu apa?",
+      "Boleh tidak kirim e-voucher ke orang lain?",
+      "E-voucher tiket Persib dikirim ke mana setelah bayar?"
+    ]
+  },
+  {
+    "intent": "kebijakan_privasi",
+    "examples": [
+      "Data pribadi saya aman tidak di Persib?",
+      "Persib pakai data saya untuk apa?",
+      "Bagaimana cara cabut persetujuan data di Persib?",
+      "Kemana saya komplain soal privasi data di Persib?",
+      "Apakah data saya dibagikan ke pihak ketiga oleh Persib?"
+    ]
+  },
+  {
     "intent": "info_jadwal_terdekat",
     "examples": [
       "Kapan pertandingan Persib berikutnya?",

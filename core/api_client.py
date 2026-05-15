@@ -39,3 +39,15 @@ def semantic_search_api(query: str, top_k: int = 3):
         json={"query": query, "top_k": top_k}
     )
     return response.json().get("results", [])
+
+def get_stok_tiket_terdekat():
+    response = httpx.get(f"{API_BASE_URL}/ticket/stok/terdekat")
+    return response.json()
+
+def get_stok_tiket_by_jadwal(id_jadwal: int):
+    response = httpx.get(f"{API_BASE_URL}/ticket/stok/{id_jadwal}")
+    return response.json()
+
+def get_stok_tiket_by_lawan(nama_lawan: str):
+    response = httpx.get(f"{API_BASE_URL}/ticket/stok/lawan/{nama_lawan}")
+    return response.json()

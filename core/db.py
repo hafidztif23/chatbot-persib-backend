@@ -190,3 +190,70 @@ def get_pemain_by_status(status: str):
         }
         for row in rows
     ]
+
+def get_stok_tiket(id_jadwal: int):
+    """Ambil stok tiket per tribun untuk pertandingan tertentu"""
+    with engine.connect() as conn:
+        rows = conn.execute(
+            text("""
+                SELECT t.nama_tribun, t.stok, j.lawan, j.tanggal_jam, j.status_pertandingan
+                FROM ticket t
+                JOIN jadwal_pertandingan j ON t.id_jadwal = j.id_jadwal
+                WHERE t.id_jadwal = :id_jadwal
+                ORDER BY t.nama_tribun
+            """),
+            {"id_jadwal": id_jadwal}
+        ).mappings().all()
+
+    if not rows:
+        return None
+
+    first = rows[0]
+    return {
+        "id_jadwal": id_jadwal,
+        "lawan": first["lawan"],
+        "tanggal_jam": first["tanggal_jam"].strftime("%d %B %Y, %H:%M WIB"),
+        "status_pertandingan": first["status_pertandingan"],
+        "tribun": [
+            {"nama_tribun": r["nama_tribun"], "stok": r["stok"]}
+            for r in rows
+        ],
+        "total_stok": sum(r["stok"] for r in rows)
+    }
+
+def get_stok_tiket_terdekat():
+    """Ambil stok tiket untuk pertandingan terdekat yang akan datang"""
+    with engine.connect() as conn:
+        row = conn.execute(
+            text("""
+                SELECT id_jadwal FROM jadwal_pertandingan
+                WHERE status_pertandingan = 'Akan Datang'
+                ORDER BY tanggal_jam ASC
+                LIMIT 1
+            """)
+        ).mappings().fetchone()
+
+    if not row:
+        return None
+
+    return get_stok_tiket(row["id_jadwal"])
+
+def get_stok_tiket_by_lawan(nama_lawan: str):
+    """Ambil stok tiket berdasarkan nama lawan (partial match), prioritas yang akan datang"""
+    with engine.connect() as conn:
+        row = conn.execute(
+            text("""
+                SELECT id_jadwal FROM jadwal_pertandingan
+                WHERE LOWER(lawan) LIKE LOWER(:nama_lawan)
+                ORDER BY
+                    CASE WHEN status_pertandingan = 'Akan Datang' THEN 0 ELSE 1 END,
+                    tanggal_jam ASC
+                LIMIT 1
+            """),
+            {"nama_lawan": f"%{nama_lawan}%"}
+        ).mappings().fetchone()
+
+    if not row:
+        return None
+
+    return get_stok_tiket(row["id_jadwal"])

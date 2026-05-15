@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import status, intents, merch, chat, jadwal, pemain, search
+from routes import status, intents, merch, chat, jadwal, pemain, search, ticket
 from core.embeddings import store_embeddings_from_docs
 from core.docs_watcher import start_docs_watcher
 
@@ -22,3 +22,4 @@ app.include_router(chat.router)
 app.include_router(jadwal.router)
 app.include_router(pemain.router)
 app.include_router(search.router)
+app.include_router(ticket.router)
