@@ -17,6 +17,7 @@ from core.api_client import (
     get_stok_tiket_terdekat,
     get_stok_tiket_by_lawan
 )
+from core.db import create_eskalasi, get_last_human_history_id
 
 router = APIRouter()
 
@@ -26,12 +27,48 @@ item_map = {
     "stok_topi":   "Topi Persib"
 }
 
+# Pesan fallback standar yang ditampilkan ke user
+FALLBACK_MESSAGE = (
+    """Maaf, saya belum dapat menemukan informasi yang tepat untuk pertanyaan Anda.
+Pertanyaan Anda telah kami catat dan akan segera ditindaklanjuti oleh tim
+Customer Service Persib Bandung. Anda juga dapat menghubungi CS kami secara
+langsung melalui jalur resmi yang tersedia. Terima kasih atas kesabaran Anda!"""
+)
+
+# Threshold similarity untuk fallback
+SIMILARITY_THRESHOLD = 0.70   # skor di bawah ini dianggap tidak relevan
+
 class QueryRequest(BaseModel):
     query: str
 
 def is_first_message(id_account: int) -> bool:
     history = load_history(id_account, limit=1)
     return len(history) == 0
+
+# HELPER — cek apakah konteks RAG cukup relevan
+def _is_context_relevant(search_results: list) -> bool:
+    """
+    Kembalikan True jika setidaknya satu hasil pencarian
+    memiliki similarity di atas threshold.
+    """
+    if not search_results:
+        return False
+    return any(r.get("similarity", 0) >= SIMILARITY_THRESHOLD for r in search_results)
+
+# HELPER — jalankan eskalasi ke DB
+def _escalate(id_account: int, query: str) -> None:
+    """
+    Simpan pertanyaan user ke tabel eskalasi setelah pesan 'human'
+    sudah tersimpan di chat_history.
+    """
+    try:
+        id_history = get_last_human_history_id(id_account)
+        if id_history:
+            create_eskalasi(id_account=id_account, id_history=id_history)
+    except Exception as exc:
+        # Eskalasi gagal tidak boleh menghentikan respons ke user
+        print(f"[ESKALASI ERROR] id_account={id_account} | {exc}")
+
 
 @router.post("/chat")
 def chat(
@@ -48,6 +85,10 @@ def chat(
         for m in history
     )
 
+    answer   = None
+    fallback = False   # flag untuk trigger eskalasi
+
+    # INTENT: stok merchandise
     if intent in item_map:
         item_name = item_map[intent]
         stock = get_merch_stock(item_name)
@@ -80,6 +121,7 @@ Pertanyaan user: '{query}'
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    # INTENT: stok tiket (terdekat)
     elif intent == "stok_tiket":
         nama_tribun = extract_tribun(query)
         data = get_stok_tiket_terdekat()
@@ -121,6 +163,7 @@ Pertanyaan user: '{query}'"""
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    # INTENT: stok tiket by lawan
     elif intent == "stok_tiket_by_jadwal":
         nama_lawan  = extract_lawan(query)
         nama_tribun = extract_tribun(query)
@@ -162,6 +205,7 @@ Pertanyaan user: '{query}'"""
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    # INTENT: kebijakan tiket
     elif intent in {
         "cara_beli_tiket",
         "kebijakan_pembatalan_tiket",
@@ -178,9 +222,12 @@ Pertanyaan user: '{query}'"""
         }
         enriched_query = intent_query_map.get(intent, query)
         search_results = semantic_search_api(enriched_query, top_k=5)
-        context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results) if search_results else "Tidak ada informasi yang relevan ditemukan."
 
-        prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
+        if not _is_context_relevant(search_results):
+            fallback = True
+        else:
+            context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
+            prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
@@ -193,10 +240,10 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan: {query}
 Jawaban:"""
+            response = llm.invoke([HumanMessage(content=prompt)])
+            answer = response.content.strip()
 
-        response = llm.invoke([HumanMessage(content=prompt)])
-        answer = response.content.strip()
-    
+    # INTENT: jadwal terdekat
     elif intent == "info_jadwal_terdekat":
         jadwal = get_jadwal_terdekat()
         data_jadwal = f"""Pertandingan terdekat:
@@ -219,7 +266,8 @@ Pertanyaan user: '{query}'"""
 
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
-        
+
+    # INTENT: jadwal by lawan
     elif intent == "info_jadwal":
         nama_lawan  = extract_lawan(query)
         jadwal_list = get_jadwal_by_lawan(nama_lawan) if nama_lawan else None
@@ -251,6 +299,7 @@ Pertanyaan user: '{query}'"""
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    # INTENT: info pemain
     elif intent == "info_pemain":
         nama   = extract_nama_pemain(query)
         pemain = get_pemain_by_nama(nama) if nama else None
@@ -277,6 +326,7 @@ Pertanyaan user: '{query}'"""
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    # INTENT: pemain by posisi
     elif intent == "info_pemain_posisi":
         posisi      = extract_posisi(query)
         pemain_list = get_pemain_by_posisi(posisi) if posisi else []
@@ -300,6 +350,7 @@ Pertanyaan user: '{query}'"""
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    # INTENT: pemain by status
     elif intent == "info_pemain_status":
         status      = extract_status_pemain(query)
         pemain_list = get_pemain_by_status(status) if status else []
@@ -322,7 +373,8 @@ Pertanyaan user: '{query}'"""
 
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
-    
+
+    # INTENT: sejarah & prestasi (RAG)
     elif intent in {
         "info_sejarah",
         "info_sejarah_awal",
@@ -345,9 +397,12 @@ Pertanyaan user: '{query}'"""
         }
         enriched_query = intent_query_map.get(intent, query)
         search_results = semantic_search_api(enriched_query, top_k=6)
-        context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results) if search_results else "Tidak ada informasi yang relevan ditemukan."
 
-        prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
+        if not _is_context_relevant(search_results):
+            fallback = True
+        else:
+            context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
+            prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
@@ -361,10 +416,10 @@ Riwayat percakapan sebelumnya:
  
 Pertanyaan: {query}
 Jawaban:"""
-        
-        response = llm.invoke([HumanMessage(content=prompt)])
-        answer = response.content.strip()
-    
+            response = llm.invoke([HumanMessage(content=prompt)])
+            answer = response.content.strip()
+
+    # INTENT: keanggotaan MemberSIB / Passport (RAG)
     elif intent in {
         "info_membersib",
         "info_passport_persib", 
@@ -387,9 +442,12 @@ Jawaban:"""
         }
         enriched_query = intent_query_map.get(intent, query)
         search_results = semantic_search_api(enriched_query, top_k=5)
-        context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results) if search_results else "Tidak ada informasi yang relevan ditemukan."
 
-        prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
+        if not _is_context_relevant(search_results):
+            fallback = True
+        else:
+            context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
+            prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
@@ -402,10 +460,10 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan: {query}
 Jawaban:"""
+            response = llm.invoke([HumanMessage(content=prompt)])
+            answer = response.content.strip()
 
-        response = llm.invoke([HumanMessage(content=prompt)])
-        answer = response.content.strip()
-    
+    # INTENT: stadion GBLA (RAG)
     elif intent in {
         "info_stadion_gbla",
         "peraturan_penonton_boleh",
@@ -428,9 +486,12 @@ Jawaban:"""
         }
         enriched_query = intent_query_map.get(intent, query)
         search_results = semantic_search_api(enriched_query, top_k=7)
-        context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results) if search_results else "Tidak ada informasi yang relevan ditemukan."
 
-        prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
+        if not _is_context_relevant(search_results):
+            fallback = True
+        else:
+            context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
+            prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
@@ -443,10 +504,10 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan: {query}
 Jawaban:"""
+            response = llm.invoke([HumanMessage(content=prompt)])
+            answer = response.content.strip()
 
-        response = llm.invoke([HumanMessage(content=prompt)])
-        answer = response.content.strip()
-
+    # INTENT: greeting
     elif intent == "greeting":
         if is_first_message(id_account):
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
@@ -468,6 +529,7 @@ Pertanyaan user: '{query}'"""
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    # INTENT: farewell
     elif intent == "farewell":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
 {LANGUAGE_INSTRUCTION}
@@ -478,7 +540,8 @@ Pertanyaan user: '{query}'"""
 
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
-    
+
+    # INTENT: tentang chatbot
     elif intent == "tentang_chatbot":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
 {LANGUAGE_INSTRUCTION}
@@ -494,7 +557,8 @@ Pertanyaan user: '{query}'"""
 
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
-    
+
+    # INTENT: bantuan
     elif intent == "bantuan":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
 {LANGUAGE_INSTRUCTION}
@@ -510,7 +574,8 @@ Pertanyaan user: '{query}'"""
 
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
-    
+
+    # INTENT: thanks
     elif intent == "thanks":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME} yang ramah.
 {LANGUAGE_INSTRUCTION}
@@ -521,6 +586,7 @@ Pertanyaan user: '{query}'"""
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    # INTENT: konfirmasi positif
     elif intent == "konfirmasi_positif":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
 {LANGUAGE_INSTRUCTION}
@@ -534,6 +600,7 @@ Pertanyaan user: '{query}'"""
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    # INTENT: konfirmasi negatif
     elif intent == "konfirmasi_negatif":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
 {LANGUAGE_INSTRUCTION}
@@ -547,11 +614,17 @@ Pertanyaan user: '{query}'"""
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
+    # FALLBACK AKHIR — intent "general" atau tidak dikenali
+    # Coba RAG dulu; jika tidak relevan, eskalasi
     else:
         search_results = semantic_search_api(query, top_k=3)
-        context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results) if search_results else "Tidak ada informasi yang relevan ditemukan."
 
-        prompt = f"""Kamu adalah asisten Persib Bandung yang ramah dan helpful.
+        if not _is_context_relevant(search_results):
+            # Tidak ada konteks yang relevan → langsung eskalasi
+            fallback = True
+        else:
+            context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
+            prompt = f"""Kamu adalah asisten Persib Bandung yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
@@ -564,23 +637,24 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan: {query}
 Jawaban:"""
+            response = llm.invoke([HumanMessage(content=prompt)])
+            answer = response.content.strip()
 
-        response = llm.invoke([HumanMessage(content=prompt)])
-        answer = response.content.strip()
+    # SIMPAN ke chat_history (termasuk fallback)
+    final_answer = FALLBACK_MESSAGE if fallback else answer
+    save_context(id_account, query, final_answer)
 
-    save_context(id_account, query, answer)
+    if fallback:
+        _escalate(id_account, query)
 
     return {
-        "intent":   intent,
-        "score":    score,
-        "response": answer
+        "intent":    intent,
+        "score":     score,
+        "response":  final_answer,
+        "escalated": fallback,   # info tambahan ke frontend
     }
 
-
-# ─────────────────────────────────────────
 # DELETE HISTORY — hanya milik sendiri
-# ─────────────────────────────────────────
-
 @router.delete("/chat/history/me")
 def delete_my_history(account: dict = Depends(get_current_account)):
     """Hapus seluruh riwayat chat milik user yang sedang login."""

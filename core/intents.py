@@ -13,7 +13,7 @@ for intent in intents_data:
     ex_embeddings = [emb_model.encode(ex) for ex in intent["examples"]]
     intent_embeddings[intent["intent"]] = ex_embeddings
 
-def detect_intent(user_query, threshold=0.55):
+def detect_intent(user_query, threshold=0.70):
     query_emb = emb_model.encode(user_query)
     best_intent = None
     best_score = -1
