@@ -17,3 +17,6 @@ openpyxl
 python-docx
 httpx
 watchdog
+passlib[bcrypt]
+python-jose[cryptography]
+email-validator

@@ -228,6 +228,16 @@
     ]
   },
   {
+    "intent": "stok_tiket_by_jadwal",
+    "examples": [
+      "Sisa tiket Persib vs Persija berapa?",
+      "Stok tiket pertandingan lawan Arema masih ada?",
+      "Cek tiket Persib vs Bali United dong",
+      "Tiket laga Persib lawan PSM sisa berapa?",
+      "Ada tiket tidak buat nonton Persib vs Borneo FC?"
+    ]
+  },
+  {
     "intent": "cara_beli_tiket",
     "examples": [
       "Beli tiket Persib di mana?",

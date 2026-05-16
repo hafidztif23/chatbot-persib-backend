@@ -1,10 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from langchain_classic.schema import HumanMessage
 from core.config import CHATBOT_NAME, LANGUAGE_INSTRUCTION
 from core.intents import detect_intent, extract_lawan, extract_nama_pemain, extract_posisi, extract_status_pemain, extract_tribun
 from core.rag import llm
 from core.memory import load_history, save_context, clear_history
+from core.dependencies import get_current_account
 from core.api_client import (
     get_merch_stock,
     get_jadwal_terdekat,
@@ -21,26 +22,27 @@ router = APIRouter()
 
 item_map = {
     "stok_jersey": "Jersey Persib 2025",
-    "stok_scarf": "Scarf Maung Bandung",
-    "stok_topi": "Topi Persib"
+    "stok_scarf":  "Scarf Maung Bandung",
+    "stok_topi":   "Topi Persib"
 }
 
 class QueryRequest(BaseModel):
     query: str
-    session_id: str = "default"
 
-def is_first_message(session_id: str) -> bool:
-    """Cek apakah ini pesan pertama dalam session"""
-    history = load_history(session_id, limit=1)
+def is_first_message(id_account: int) -> bool:
+    history = load_history(id_account, limit=1)
     return len(history) == 0
 
 @router.post("/chat")
-def chat(req: QueryRequest):
-    query = req.query
-    session_id = req.session_id
+def chat(
+    req: QueryRequest,
+    account: dict = Depends(get_current_account)
+):
+    query      = req.query
+    id_account = account["id_account"]
     intent, score = detect_intent(query)
 
-    history = load_history(session_id, limit=5)
+    history = load_history(id_account, limit=5)
     history_text = "\n".join(
         f"{'User' if isinstance(m, HumanMessage) else 'Asisten'}: {m.content}"
         for m in history
@@ -84,17 +86,12 @@ Pertanyaan user: '{query}'
 
         if data and "tribun" in data:
             if nama_tribun:
-                # Filter ke tribun spesifik yang diminta user
-                tribun_filter = [
-                    t for t in data["tribun"]
-                    if t["nama_tribun"] == nama_tribun
-                ]
+                tribun_filter = [t for t in data["tribun"] if t["nama_tribun"] == nama_tribun]
                 if tribun_filter:
                     detail_tribun = f"- {tribun_filter[0]['nama_tribun']}: {tribun_filter[0]['stok']:,} tiket"
                 else:
                     detail_tribun = f"Data tribun '{nama_tribun}' tidak ditemukan."
             else:
-                # Tampilkan semua tribun
                 detail_tribun = "\n".join(
                     f"- {t['nama_tribun']}: {t['stok']:,} tiket"
                     for t in data["tribun"]
@@ -107,7 +104,6 @@ Status: {data['status_pertandingan']}
 Stok tiket{f' tribun {nama_tribun}' if nama_tribun else ' per tribun'}:
 {detail_tribun}
 {f"Total stok semua tribun: {data['total_stok']:,} tiket" if not nama_tribun else ""}"""
-
         else:
             konteks = "Tidak ada data stok tiket untuk pertandingan yang akan datang."
 
@@ -126,20 +122,17 @@ Pertanyaan user: '{query}'"""
         answer = response.content.strip()
 
     elif intent == "stok_tiket_by_jadwal":
-        nama_lawan = extract_lawan(query)
+        nama_lawan  = extract_lawan(query)
         nama_tribun = extract_tribun(query)
         data = get_stok_tiket_by_lawan(nama_lawan) if nama_lawan else None
 
         if data and "tribun" in data:
             if nama_tribun:
-                tribun_filter = [
-                    t for t in data["tribun"]
-                    if t["nama_tribun"] == nama_tribun
-                ]
-                if tribun_filter:
-                    detail_tribun = f"- {tribun_filter[0]['nama_tribun']}: {tribun_filter[0]['stok']:,} tiket"
-                else:
-                    detail_tribun = f"Data tribun '{nama_tribun}' tidak ditemukan."
+                tribun_filter = [t for t in data["tribun"] if t["nama_tribun"] == nama_tribun]
+                detail_tribun = (
+                    f"- {tribun_filter[0]['nama_tribun']}: {tribun_filter[0]['stok']:,} tiket"
+                    if tribun_filter else f"Data tribun '{nama_tribun}' tidak ditemukan."
+                )
             else:
                 detail_tribun = "\n".join(
                     f"- {t['nama_tribun']}: {t['stok']:,} tiket"
@@ -152,7 +145,6 @@ Status: {data['status_pertandingan']}
 Stok tiket{f' tribun {nama_tribun}' if nama_tribun else ' per tribun'}:
 {detail_tribun}
 {f"Total stok semua tribun: {data['total_stok']:,} tiket" if not nama_tribun else ""}"""
-
         else:
             konteks = f"Tidak ada data stok tiket untuk pertandingan melawan '{nama_lawan}'."
 
@@ -178,23 +170,15 @@ Pertanyaan user: '{query}'"""
         "kebijakan_privasi"
     }:
         intent_query_map = {
-            "cara_beli_tiket": "cara beli tiket Persib jalur resmi aplikasi website",
+            "cara_beli_tiket":            "cara beli tiket Persib jalur resmi aplikasi website",
             "kebijakan_pembatalan_tiket": "pembatalan tiket refund pengembalian uang potongan administrasi",
-            "kebijakan_data_pembeli": "data pembeli NIK nama email nomor handphone tidak bisa diubah",
-            "kebijakan_evoucher": "e-voucher barcode gelang penanda penukaran tiket elektronik",
-            "kebijakan_privasi": "kebijakan privasi data konsumen penggunaan data keamanan kontak"
+            "kebijakan_data_pembeli":     "data pembeli NIK nama email nomor handphone tidak bisa diubah",
+            "kebijakan_evoucher":         "e-voucher barcode gelang penanda penukaran tiket elektronik",
+            "kebijakan_privasi":          "kebijakan privasi data konsumen penggunaan data keamanan kontak"
         }
-
         enriched_query = intent_query_map.get(intent, query)
         search_results = semantic_search_api(enriched_query, top_k=5)
-
-        if search_results:
-            context = "\n\n".join(
-                f"[Sumber: {r['source']}]\n{r['content']}"
-                for r in search_results
-            )
-        else:
-            context = "Tidak ada informasi yang relevan ditemukan."
+        context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results) if search_results else "Tidak ada informasi yang relevan ditemukan."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
@@ -215,16 +199,13 @@ Jawaban:"""
     
     elif intent == "info_jadwal_terdekat":
         jadwal = get_jadwal_terdekat()
-        if jadwal:
-            data_jadwal = f"""Pertandingan terdekat:
+        data_jadwal = f"""Pertandingan terdekat:
 - Lawan: {jadwal['lawan']}
 - Tanggal: {jadwal['tanggal_jam']}
 - Lokasi: {jadwal['lokasi']}
 - Kompetisi: {jadwal['kompetisi']}
-- Status: {jadwal['status_pertandingan']}"""
-        else:
-            data_jadwal = "Tidak ada jadwal pertandingan yang akan datang."
-        
+- Status: {jadwal['status_pertandingan']}""" if jadwal else "Tidak ada jadwal pertandingan yang akan datang."
+
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
 {LANGUAGE_INSTRUCTION}
 Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
@@ -235,12 +216,12 @@ Riwayat percakapan sebelumnya:
 {history_text}
 
 Pertanyaan user: '{query}'"""
-        
+
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
         
     elif intent == "info_jadwal":
-        nama_lawan = extract_lawan(query)
+        nama_lawan  = extract_lawan(query)
         jadwal_list = get_jadwal_by_lawan(nama_lawan) if nama_lawan else None
 
         if jadwal_list:
@@ -271,19 +252,16 @@ Pertanyaan user: '{query}'"""
         answer = response.content.strip()
 
     elif intent == "info_pemain":
-        nama = extract_nama_pemain(query)
+        nama   = extract_nama_pemain(query)
         pemain = get_pemain_by_nama(nama) if nama else None
 
-        if pemain:
-            data_pemain = f"""Data pemain:
+        data_pemain = f"""Data pemain:
 - Nama: {pemain['nama_pemain']}
 - Nomor Punggung: {pemain['nomor_punggung']}
 - Posisi: {pemain['posisi']}
 - Kewarganegaraan: {pemain['kewarganegaraan']}
 - Tanggal Lahir: {pemain['tanggal_lahir']}
-- Status: {pemain['status']}"""
-        else:
-            data_pemain = f"Pemain dengan nama '{nama}' tidak ditemukan di skuad Persib."
+- Status: {pemain['status']}""" if pemain else f"Pemain dengan nama '{nama}' tidak ditemukan di skuad Persib."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
 {LANGUAGE_INSTRUCTION}
@@ -300,16 +278,13 @@ Pertanyaan user: '{query}'"""
         answer = response.content.strip()
 
     elif intent == "info_pemain_posisi":
-        posisi = extract_posisi(query)
+        posisi      = extract_posisi(query)
         pemain_list = get_pemain_by_posisi(posisi) if posisi else []
 
-        if pemain_list:
-            data_pemain = f"Daftar pemain posisi {posisi}:\n" + "\n".join(
-                f"- #{p['nomor_punggung']} {p['nama_pemain']} ({p['kewarganegaraan']})"
-                for p in pemain_list
-            )
-        else:
-            data_pemain = f"Tidak ada data pemain untuk posisi '{posisi}'."
+        data_pemain = (
+            f"Daftar pemain posisi {posisi}:\n" +
+            "\n".join(f"- #{p['nomor_punggung']} {p['nama_pemain']} ({p['kewarganegaraan']})" for p in pemain_list)
+        ) if pemain_list else f"Tidak ada data pemain untuk posisi '{posisi}'."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
 {LANGUAGE_INSTRUCTION}
@@ -326,16 +301,13 @@ Pertanyaan user: '{query}'"""
         answer = response.content.strip()
 
     elif intent == "info_pemain_status":
-        status = extract_status_pemain(query)
+        status      = extract_status_pemain(query)
         pemain_list = get_pemain_by_status(status) if status else []
 
-        if pemain_list:
-            data_pemain = f"Daftar pemain dengan status {status}:\n" + "\n".join(
-                f"- #{p['nomor_punggung']} {p['nama_pemain']} ({p['posisi']})"
-                for p in pemain_list
-            )
-        else:
-            data_pemain = f"Tidak ada pemain dengan status '{status}'."
+        data_pemain = (
+            f"Daftar pemain dengan status {status}:\n" +
+            "\n".join(f"- #{p['nomor_punggung']} {p['nama_pemain']} ({p['posisi']})" for p in pemain_list)
+        ) if pemain_list else f"Tidak ada pemain dengan status '{status}'."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
 {LANGUAGE_INSTRUCTION}
@@ -362,26 +334,18 @@ Pertanyaan user: '{query}'"""
         "info_pemain_legenda"
     }:
         intent_query_map = {
-            "info_sejarah": "sejarah umum Persib Bandung asal-usul berdiri",
-            "info_sejarah_awal": "BIVB asal-usul berdiri Persib 1919 1933 pendiri ketua",
-            "info_sejarah_era_perserikatan": "Persib era Perserikatan juara 1937 1961 1986 1994 pemain pelatih",
+            "info_sejarah":                    "sejarah umum Persib Bandung asal-usul berdiri",
+            "info_sejarah_awal":               "BIVB asal-usul berdiri Persib 1919 1933 pendiri ketua",
+            "info_sejarah_era_perserikatan":   "Persib era Perserikatan juara 1937 1961 1986 1994 pemain pelatih",
             "info_sejarah_era_liga_indonesia": "Persib Liga Indonesia 1994 1995 juara Piala Champions Asia",
-            "info_sejarah_era_liga_super": "Persib Liga Super Indonesia LSI 2014 juara final Persipura",
-            "info_sejarah_era_liga1": "Persib Liga 1 juara 2023 2024 2025 Bojan Hodak David da Silva",
-            "info_prestasi_juara": "gelar juara Persib trofi prestasi kompetisi liga piala",
-            "info_pemain_legenda": "pemain legenda bersejarah Persib Robby Darwis Adjat Sudradjat Djadjang",
+            "info_sejarah_era_liga_super":     "Persib Liga Super Indonesia LSI 2014 juara final Persipura",
+            "info_sejarah_era_liga1":          "Persib Liga 1 juara 2023 2024 2025 Bojan Hodak David da Silva",
+            "info_prestasi_juara":             "gelar juara Persib trofi prestasi kompetisi liga piala",
+            "info_pemain_legenda":             "pemain legenda bersejarah Persib Robby Darwis Adjat Sudradjat Djadjang",
         }
-
         enriched_query = intent_query_map.get(intent, query)
         search_results = semantic_search_api(enriched_query, top_k=6)
-
-        if search_results:
-            context = "\n\n".join(
-                f"[Sumber: {r['source']}]\n{r['content']}"
-                for r in search_results
-            )
-        else:
-            context = "Tidak ada informasi yang relevan ditemukan."
+        context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results) if search_results else "Tidak ada informasi yang relevan ditemukan."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
@@ -412,27 +376,18 @@ Jawaban:"""
         "perbandingan_keanggotaan"
     }:
         intent_query_map = {
-            "info_membersib": "MemberSIB program keanggotaan digital Persib",
-            "info_passport_persib": "Passport Persib program keanggotaan premium",
-            "benefit_membersib": "manfaat keuntungan benefit MemberSIB",
-            "benefit_passport_persib": "manfaat keuntungan benefit Passport Persib",
-            "harga_keanggotaan": "harga biaya keanggotaan MemberSIB Passport Persib",
-            "cara_daftar_membersib": "cara daftar pendaftaran MemberSIB",
-            "cara_daftar_passport": "cara daftar pendaftaran Passport Persib",
+            "info_membersib":           "MemberSIB program keanggotaan digital Persib",
+            "info_passport_persib":     "Passport Persib program keanggotaan premium",
+            "benefit_membersib":        "manfaat keuntungan benefit MemberSIB",
+            "benefit_passport_persib":  "manfaat keuntungan benefit Passport Persib",
+            "harga_keanggotaan":        "harga biaya keanggotaan MemberSIB Passport Persib",
+            "cara_daftar_membersib":    "cara daftar pendaftaran MemberSIB",
+            "cara_daftar_passport":     "cara daftar pendaftaran Passport Persib",
             "perbandingan_keanggotaan": "perbedaan MemberSIB Passport Persib perbandingan"
         }
-
-        # Gunakan query yang diperkaya untuk semantic search
         enriched_query = intent_query_map.get(intent, query)
         search_results = semantic_search_api(enriched_query, top_k=5)
-
-        if search_results:
-            context = "\n\n".join(
-                f"[Sumber: {r['source']}]\n{r['content']}"
-                for r in search_results
-            )
-        else:
-            context = "Tidak ada informasi yang relevan ditemukan."
+        context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results) if search_results else "Tidak ada informasi yang relevan ditemukan."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
@@ -462,26 +417,18 @@ Jawaban:"""
         "info_media_stadion"
     }:
         intent_query_map = {
-            "info_stadion_gbla": "informasi umum stadion Gelora Bandung Lautan Api kapasitas",
-            "peraturan_penonton_boleh": "barang yang boleh dibawa penonton ke stadion diizinkan",
+            "info_stadion_gbla":           "informasi umum stadion Gelora Bandung Lautan Api kapasitas",
+            "peraturan_penonton_boleh":    "barang yang boleh dibawa penonton ke stadion diizinkan",
             "peraturan_penonton_dilarang": "barang yang dilarang dibawa penonton larangan stadion",
-            "sanksi_pelanggaran": "denda sanksi pelanggaran stadion GBLA",
-            "fasilitas_stadion": "fasilitas stadion GBLA toilet musholla medis disabilitas",
-            "info_parkir_stadion": "area parkir stadion GBLA kapasitas motor mobil bus",
-            "info_tiket_stadion": "aturan tiket masuk stadion penonton anak-anak kategori",
-            "info_media_stadion": "aturan media wartawan fotografer akreditasi drone stadion"
+            "sanksi_pelanggaran":          "denda sanksi pelanggaran stadion GBLA",
+            "fasilitas_stadion":           "fasilitas stadion GBLA toilet musholla medis disabilitas",
+            "info_parkir_stadion":         "area parkir stadion GBLA kapasitas motor mobil bus",
+            "info_tiket_stadion":          "aturan tiket masuk stadion penonton anak-anak kategori",
+            "info_media_stadion":          "aturan media wartawan fotografer akreditasi drone stadion"
         }
-
         enriched_query = intent_query_map.get(intent, query)
         search_results = semantic_search_api(enriched_query, top_k=7)
-
-        if search_results:
-            context = "\n\n".join(
-                f"[Sumber: {r['source']}]\n{r['content']}"
-                for r in search_results
-            )
-        else:
-            context = "Tidak ada informasi yang relevan ditemukan."
+        context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results) if search_results else "Tidak ada informasi yang relevan ditemukan."
 
         prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
@@ -501,18 +448,19 @@ Jawaban:"""
         answer = response.content.strip()
 
     elif intent == "greeting":
-        if is_first_message(session_id):
+        if is_first_message(id_account):
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
 {LANGUAGE_INSTRUCTION}
-Ini adalah pertama kali user menyapa. Perkenalkan dirimu dengan hangat dan sebutkan
-bahwa kamu bisa membantu informasi seputar Persib Bandung seperti jadwal pertandingan,
-data pemain, stok merchandise, keanggotaan, dan informasi stadion GBLA.
+Ini adalah pertama kali user menyapa. Sapa user dengan menyebut namanya: {account['nama_lengkap']}.
+Perkenalkan dirimu dengan hangat dan sebutkan bahwa kamu bisa membantu informasi seputar
+Persib Bandung seperti jadwal pertandingan, data pemain, stok merchandise, keanggotaan,
+dan informasi stadion GBLA.
 
 Pertanyaan user: '{query}'"""
         else:
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
 {LANGUAGE_INSTRUCTION}
-User menyapa kembali. Balas sapaannya dengan hangat dan singkat tanpa perlu memperkenalkan diri lagi.
+User menyapa kembali. Balas sapaannya dengan menyebut namanya: {account['nama_lengkap']}.
 Tanyakan apa yang bisa kamu bantu.
 
 Pertanyaan user: '{query}'"""
@@ -523,8 +471,8 @@ Pertanyaan user: '{query}'"""
     elif intent == "farewell":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
 {LANGUAGE_INSTRUCTION}
-Balas perpisahan atau ucapan terima kasih dari user dengan hangat dan sopan tanpa perlu memperkenalkan diri.
-Sampaikan bahwa kamu siap membantu kapan saja jika user butuh informasi tentang Persib lagi.
+Balas perpisahan dari {account['nama_lengkap']} dengan hangat dan sopan.
+Sampaikan bahwa kamu siap membantu kapan saja jika butuh informasi tentang Persib lagi.
 
 Pertanyaan user: '{query}'"""
 
@@ -532,32 +480,15 @@ Pertanyaan user: '{query}'"""
         answer = response.content.strip()
     
     elif intent == "tentang_chatbot":
-        if is_first_message(session_id):
-            prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
+        prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
 {LANGUAGE_INSTRUCTION}
-Perkenalkan dirimu dan jelaskan hal-hal yang bisa kamu bantu, yaitu:
+{'Perkenalkan dirimu dan jelaskan' if is_first_message(id_account) else 'Jelaskan'} hal-hal yang bisa kamu bantu:
 - Informasi jadwal pertandingan Persib
 - Data dan profil pemain Persib
 - Stok merchandise resmi Persib
 - Informasi keanggotaan MemberSIB dan Passport Persib
 - Peraturan dan fasilitas Stadion GBLA
 - Sejarah dan informasi umum Persib Bandung
-
-Sampaikan dengan ramah, singkat, dan natural.
-
-Pertanyaan user: '{query}'"""
-        else:
-            prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
-{LANGUAGE_INSTRUCTION}
-User bertanya tentang kemampuanmu. Jelaskan hal-hal yang bisa kamu bantu tanpa perlu memperkenalkan diri lagi, yaitu:
-- Informasi jadwal pertandingan Persib
-- Data dan profil pemain Persib
-- Stok merchandise resmi Persib
-- Informasi keanggotaan MemberSIB dan Passport Persib
-- Peraturan dan fasilitas Stadion GBLA
-- Sejarah dan informasi umum Persib Bandung
-
-Sampaikan dengan ramah dan singkat.
 
 Pertanyaan user: '{query}'"""
 
@@ -567,8 +498,8 @@ Pertanyaan user: '{query}'"""
     elif intent == "bantuan":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
 {LANGUAGE_INSTRUCTION}
-{'Perkenalkan dirimu singkat lalu jelaskan' if is_first_message(session_id) else 'Jelaskan'} cara menggunakan chatbot ini dengan ramah dan mudah dipahami.
-Berikan contoh pertanyaan yang bisa diajukan seperti:
+{'Perkenalkan dirimu singkat lalu jelaskan' if is_first_message(id_account) else 'Jelaskan'} cara menggunakan chatbot ini.
+Berikan contoh pertanyaan seperti:
 - "Kapan Persib main lagi?"
 - "Stok jersey Persib masih ada?"
 - "Siapa saja striker Persib?"
@@ -583,8 +514,7 @@ Pertanyaan user: '{query}'"""
     elif intent == "thanks":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME} yang ramah.
 {LANGUAGE_INSTRUCTION}
-Balas ucapan terima kasih dari user dengan hangat dan sopan tanpa perlu memperkenalkan diri.
-Sampaikan bahwa kamu senang bisa membantu dan siap membantu kapan saja jika user butuh informasi tentang Persib lagi.
+Balas ucapan terima kasih dari {account['nama_lengkap']} dengan hangat dan sopan.
 
 Pertanyaan user: '{query}'"""
         
@@ -594,8 +524,7 @@ Pertanyaan user: '{query}'"""
     elif intent == "konfirmasi_positif":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
 {LANGUAGE_INSTRUCTION}
-User memberikan konfirmasi positif. Respons dengan singkat dan tanyakan apakah ada hal lain yang bisa dibantu.
-Jangan memperkenalkan diri.
+User memberikan konfirmasi positif. Respons singkat dan tanyakan apakah ada hal lain yang bisa dibantu.
 
 Riwayat percakapan sebelumnya:
 {history_text}
@@ -608,9 +537,7 @@ Pertanyaan user: '{query}'"""
     elif intent == "konfirmasi_negatif":
         prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
 {LANGUAGE_INSTRUCTION}
-User memberikan konfirmasi negatif atau menyatakan informasi yang diberikan kurang tepat.
-Minta maaf dengan singkat dan tawarkan untuk mencoba pertanyaan dengan cara yang berbeda.
-Jangan memperkenalkan diri.
+User menyatakan informasi kurang tepat. Minta maaf singkat dan tawarkan untuk mencoba lagi.
 
 Riwayat percakapan sebelumnya:
 {history_text}
@@ -622,14 +549,7 @@ Pertanyaan user: '{query}'"""
 
     else:
         search_results = semantic_search_api(query, top_k=3)
-
-        if search_results:
-            context = "\n\n".join(
-                f"[Sumber: {r['source']}]\n{r['content']}"
-                for r in search_results
-            )
-        else:
-            context = "Tidak ada informasi yang relevan ditemukan."
+        context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results) if search_results else "Tidak ada informasi yang relevan ditemukan."
 
         prompt = f"""Kamu adalah asisten Persib Bandung yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
@@ -648,11 +568,21 @@ Jawaban:"""
         response = llm.invoke([HumanMessage(content=prompt)])
         answer = response.content.strip()
 
-    save_context(session_id, query, answer)
+    save_context(id_account, query, answer)
 
-    return {"intent": intent, "score": score, "response": answer, "session_id": session_id}
+    return {
+        "intent":   intent,
+        "score":    score,
+        "response": answer
+    }
 
-@router.delete("/chat/history/{session_id}")
-def delete_history(session_id: str):
-    clear_history(session_id)
-    return {"message": f"History untuk session '{session_id}' berhasil dihapus"}
+
+# ─────────────────────────────────────────
+# DELETE HISTORY — hanya milik sendiri
+# ─────────────────────────────────────────
+
+@router.delete("/chat/history/me")
+def delete_my_history(account: dict = Depends(get_current_account)):
+    """Hapus seluruh riwayat chat milik user yang sedang login."""
+    clear_history(account["id_account"])
+    return {"message": "Riwayat chat berhasil dihapus."}

@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from routes import status, intents, merch, chat, jadwal, pemain, search, ticket
+from routes.auth import router as auth_router
 from core.embeddings import store_embeddings_from_docs
 from core.docs_watcher import start_docs_watcher
 
@@ -15,6 +16,7 @@ def startup():
     # Jalankan watcher di background
     start_docs_watcher(docs_folder="docs")
 
+app.include_router(auth_router)
 app.include_router(status.router)
 app.include_router(intents.router)
 app.include_router(merch.router)
