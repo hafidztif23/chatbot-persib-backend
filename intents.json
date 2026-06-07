@@ -1305,5 +1305,45 @@
       "Bagaimana prosedur izin dokumentasi resmi di stadion GBLA?",
       "Siapa yang berhak memberikan otorisasi peliputan media di GBLA?"
     ]
+  },
+  {
+    "intent": "fallback_eskalasi",
+    "examples": [
+      "Saya mau komplain",
+      "Ada masalah dengan pesanan saya",
+      "Tiket saya sudah dibayar tapi tidak muncul",
+      "Pesanan saya belum diproses",
+      "Saya tidak menerima e-voucher tiket",
+      "Uang saya sudah terpotong tapi tiket belum ada",
+      "Saya mau refund tiket",
+      "Bagaimana cara mengajukan pengembalian dana?",
+      "Jersey yang saya beli cacat",
+      "Merchandise yang datang tidak sesuai pesanan",
+      "Saya tidak puas dengan pelayanan Persib",
+      "Saya ingin berbicara dengan customer service",
+      "Hubungkan saya dengan CS",
+      "Saya butuh bantuan langsung dari tim Persib",
+      "Tolong bantu saya, ada masalah dengan akun saya",
+      "Akun saya tidak bisa login",
+      "Saya lupa password dan tidak bisa reset",
+      "Data saya salah di aplikasi",
+      "Saya ingin mengubah data yang sudah terdaftar",
+      "Ada kesalahan pada data pembelian saya",
+      "Saya mau lapor ada oknum yang menjual tiket palsu",
+      "Ada yang jual tiket dengan harga tidak wajar",
+      "Saya kena tipu beli tiket",
+      "Saya kehilangan barang di stadion",
+      "Ada insiden di tribun yang ingin saya laporkan",
+      "Saya ingin mengajukan saran untuk Persib",
+      "Saya punya keluhan tentang fasilitas stadion",
+      "Saya tidak bisa masuk stadion meskipun punya tiket",
+      "Petugas stadion memperlakukan saya tidak baik",
+      "Saya mau ajukan komplain resmi",
+      "Tolong eskalasikan pertanyaan saya ke tim CS",
+      "Bisa minta tolong langsung ke orang?",
+      "Saya butuh solusi yang tidak bisa dijawab bot",
+      "Pertanyaan saya butuh jawaban dari manusia",
+      "Saya sudah coba tanya tapi jawabannya tidak membantu"
+    ]
   }
 ]
