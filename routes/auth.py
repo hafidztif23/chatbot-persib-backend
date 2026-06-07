@@ -93,7 +93,7 @@ def _format_account(row: dict) -> dict:
 def register(data: RegisterRequest):
     """Daftarkan akun baru. Membership default = 'reguler'."""
 
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         # Cek duplikat email
         if conn.execute(
             text("SELECT 1 FROM accounts WHERE email = :email"),
@@ -137,7 +137,6 @@ def register(data: RegisterRequest):
                 "password":      hashed,
             },
         )
-        conn.commit()
         new_id = result.fetchone()[0]
 
     return {
@@ -206,11 +205,10 @@ def update_profile(
     set_clause = ", ".join(f"{k} = :{k}" for k in fields if k != "id_account")
     set_clause += ", updated_at = NOW()"
 
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         conn.execute(
             text(f"UPDATE accounts SET {set_clause} WHERE id_account = :id_account"),
             fields,
         )
-        conn.commit()
 
     return {"message": "Profil berhasil diupdate."}

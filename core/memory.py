@@ -3,7 +3,8 @@ from langchain_classic.schema import HumanMessage, AIMessage
 from core.db import engine
 
 def save_message(id_account: int, role: str, content: str):
-    with engine.connect() as conn:
+    # Gunakan engine.begin() agar commit/rollback ditangani otomatis
+    with engine.begin() as conn:
         conn.execute(
             text("""
                 INSERT INTO chat_history (session_id, role, content)
@@ -11,7 +12,6 @@ def save_message(id_account: int, role: str, content: str):
             """),
             {"id_account": id_account, "role": role, "content": content}
         )
-        conn.commit()
 
 def load_history(id_account: int, limit: int = 5):
     """Ambil N percakapan terakhir per account"""
@@ -45,9 +45,9 @@ def save_context(id_account: int, human_input: str, ai_output: str):
 
 def clear_history(id_account: int):
     """Hapus semua history untuk account tertentu"""
-    with engine.connect() as conn:
+    # Gunakan engine.begin()
+    with engine.begin() as conn:
         conn.execute(
             text("DELETE FROM chat_history WHERE session_id = :id_account"),
             {"id_account": id_account}
         )
-        conn.commit()
