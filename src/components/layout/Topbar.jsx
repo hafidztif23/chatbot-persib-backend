@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import profileImage from "../../assets/images/fotoDefault.jpg";
+import profileImage from "../../images/fotoDefault.jpg";
 import userData from "../../data/userData";
 import "../../styles/topbar.css";
 

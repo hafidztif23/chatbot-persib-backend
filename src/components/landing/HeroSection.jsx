@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '../common/Button';
-import heroBg from "../../assets/images/hero-bg.jpg";
+import heroBg from "../../images/hero-bg.jpg";
 
 const HeroSection = () => {
   return (
