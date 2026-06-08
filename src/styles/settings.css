@@ -1,0 +1,127 @@
+/* ==========================================================================
+   DESKTOP DEFAULT STYLES SETTINGS
+   ========================================================================== */
+.settings-page {
+  max-width: 1000px;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.settings-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 24px 0;
+}
+
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 24px;
+}
+
+.settings-label {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.settings-row > div:last-child,
+.settings-select {
+  min-width: 240px;
+}
+
+.settings-row:last-child {
+  margin-bottom: 0;
+}
+
+.settings-actions {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.settings-actions .profile-update-btn {
+  min-width: 160px;
+  padding: 12px 24px;
+  font-weight: 600;
+}
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .settings-page {
+    padding: 16px;
+  }
+  
+  .settings-title {
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+  
+  .settings-row {
+    margin-bottom: 16px;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px; 
+    margin-bottom: 24px;
+  }
+
+  .settings-row:has(.toggle-switch),
+  .settings-grid > div:first-child .settings-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .settings-row > div:last-child,
+  .settings-select {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  .settings-actions {
+    margin-top: 24px;
+    width: 100%;
+  }
+
+  .settings-actions .profile-update-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-title {
+    font-size: 24px; 
+    margin-bottom: 16px;
+  }
+
+  .settings-grid {
+    gap: 16px;
+  }
+
+  .settings-grid .app-card {
+    padding: 16px 16px; 
+  }
+  
+  .settings-row > span,
+  .settings-label {
+    font-size: 0.9rem;
+  }
+}
