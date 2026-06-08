@@ -45,6 +45,7 @@ def is_first_message(id_account: int) -> bool:
     history = load_history(id_account, limit=1)
     return len(history) == 0
 
+# HELPER — cek apakah konteks RAG cukup relevan
 def _is_context_relevant(search_results: list) -> bool:
     """
     Kembalikan True jika setidaknya satu hasil pencarian
@@ -54,6 +55,7 @@ def _is_context_relevant(search_results: list) -> bool:
         return False
     return any(r.get("similarity", 0) >= SIMILARITY_THRESHOLD for r in search_results)
 
+# HELPER — jalankan eskalasi ke DB
 def _escalate(id_account: int, query: str) -> None:
     """
     Simpan pertanyaan user ke tabel eskalasi setelah pesan 'human'
@@ -64,8 +66,8 @@ def _escalate(id_account: int, query: str) -> None:
         if id_history:
             create_eskalasi(id_account=id_account, id_history=id_history)
     except Exception as exc:
-        # Eskalasi gagal tidak boleh menghentikan respons ke user
         print(f"[ESKALASI ERROR] id_account={id_account} | {exc}")
+
 
 @router.post("/chat")
 def chat(
@@ -234,8 +236,12 @@ Pertanyaan user: '{query}'"""
             enriched_query = intent_query_map.get(intent, query)
             search_results = semantic_search_api(enriched_query, top_k=5)
 
-            context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
-            prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
+            if not _is_context_relevant(search_results):
+                fallback = True
+                answer = ""
+            else:
+                context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
+                prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
@@ -248,8 +254,8 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan: {query}
 Jawaban:"""
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+                response = llm.invoke([HumanMessage(content=prompt)])
+                answer = response.content.strip()
 
         # INTENT: jadwal terdekat
         elif intent == "info_jadwal_terdekat":
@@ -406,8 +412,12 @@ Pertanyaan user: '{query}'"""
             enriched_query = intent_query_map.get(intent, query)
             search_results = semantic_search_api(enriched_query, top_k=6)
 
-            context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
-            prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
+            if not _is_context_relevant(search_results):
+                fallback = True
+                answer = ""
+            else:
+                context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
+                prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
@@ -421,8 +431,8 @@ Riwayat percakapan sebelumnya:
  
 Pertanyaan: {query}
 Jawaban:"""
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+                response = llm.invoke([HumanMessage(content=prompt)])
+                answer = response.content.strip()
 
         # INTENT: keanggotaan MemberSIB / Passport (RAG)
         elif intent in {
@@ -448,8 +458,12 @@ Jawaban:"""
             enriched_query = intent_query_map.get(intent, query)
             search_results = semantic_search_api(enriched_query, top_k=5)
 
-            context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
-            prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
+            if not _is_context_relevant(search_results):
+                fallback = True
+                answer = ""
+            else:
+                context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
+                prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
@@ -462,8 +476,8 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan: {query}
 Jawaban:"""
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+                response = llm.invoke([HumanMessage(content=prompt)])
+                answer = response.content.strip()
 
         # INTENT: stadion GBLA (RAG)
         elif intent in {
@@ -489,8 +503,12 @@ Jawaban:"""
             enriched_query = intent_query_map.get(intent, query)
             search_results = semantic_search_api(enriched_query, top_k=7)
 
-            context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
-            prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
+            if not _is_context_relevant(search_results):
+                fallback = True
+                answer = ""
+            else:
+                context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
+                prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
@@ -503,8 +521,8 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan: {query}
 Jawaban:"""
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+                response = llm.invoke([HumanMessage(content=prompt)])
+                answer = response.content.strip()
 
         # INTENT: greeting
         elif intent == "greeting":
@@ -612,10 +630,6 @@ Pertanyaan user: '{query}'"""
 
             response = llm.invoke([HumanMessage(content=prompt)])
             answer = response.content.strip()
-        
-        elif intent == "fallback_eskalasi":
-            fallback = True
-            answer = ""
 
         # FALLBACK AKHIR — intent "general" atau tidak dikenali
         else:
@@ -624,6 +638,7 @@ Pertanyaan user: '{query}'"""
             if not _is_context_relevant(search_results):
                 # Tidak ada konteks yang relevan → langsung eskalasi
                 fallback = True
+                answer = ""
             else:
                 context = "\n\n".join(f"[Sumber: {r['source']}]\n{r['content']}" for r in search_results)
                 prompt = f"""Kamu adalah asisten Persib Bandung yang ramah dan helpful.
@@ -639,8 +654,8 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan: {query}
 Jawaban:"""
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+                response = llm.invoke([HumanMessage(content=prompt)])
+                answer = response.content.strip()
 
         # ==========================================
         # PENYELESAIAN & PENYIMPANAN
