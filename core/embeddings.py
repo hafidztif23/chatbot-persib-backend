@@ -30,7 +30,7 @@ def get_file_hash(filepath: str) -> str:
     return hasher.hexdigest()
 
 def is_already_embedded(file_name: str, file_hash: str) -> bool:
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         row = conn.execute(
             text("SELECT file_hash FROM docs_embedding_tracker WHERE file_name = :file_name"),
             {"file_name": file_name}
@@ -42,7 +42,7 @@ def is_already_embedded(file_name: str, file_hash: str) -> bool:
     return row[0] == file_hash
 
 def update_tracker(file_name: str, file_hash: str):
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         conn.execute(
             text("""
                 INSERT INTO docs_embedding_tracker (file_name, file_hash, last_embedded)
@@ -52,15 +52,13 @@ def update_tracker(file_name: str, file_hash: str):
             """),
             {"file_name": file_name, "file_hash": file_hash}
         )
-        conn.commit()
 
 def remove_tracker(file_name: str):
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         conn.execute(
             text("DELETE FROM docs_embedding_tracker WHERE file_name = :file_name"),
             {"file_name": file_name}
         )
-        conn.commit()
 
 def embed_text(text: str) -> list:
     return emb_model.encode(text).tolist()
@@ -135,7 +133,7 @@ def embed_single_file(filepath: str, force: bool = False):
 
     print(f"  → chunk_size={config['chunk_size']}, overlap={config['overlap']}, total={len(chunks)} chunks")
 
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         conn.execute(
             text("DELETE FROM document_embeddings WHERE source_file = :source_file"),
             {"source_file": file_name}
@@ -154,7 +152,6 @@ def embed_single_file(filepath: str, force: bool = False):
                     "embedding": str(embedding)
                 }
             )
-        conn.commit()
 
     update_tracker(file_name, file_hash)
     print(f"[OK] {file_name} → {len(chunks)} chunks disimpan")
@@ -172,7 +169,7 @@ def store_embeddings_from_docs(docs_folder: str = "docs", force: bool = False):
 
 def semantic_search(query: str, top_k: int = 3) -> list:
     query_embedding = embed_text(query)
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         rows = conn.execute(
             text("""
                 SELECT source_file, content,
