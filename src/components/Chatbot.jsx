@@ -179,7 +179,7 @@ function Chatbot() {
           <input
             type="text"
             className="chat-input"
-            placeholder="Tanya Pak Robby tentang taktik..."
+            placeholder="Ajukan Pertanyaan atau Mulai Obrolan..."
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             disabled={isLoading}
