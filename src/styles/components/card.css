@@ -1,0 +1,32 @@
+.app-card {
+  background:rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 12px 24px;
+  backdrop-filter: blur(12px);
+}
+
+.app-card-title {
+  margin-bottom: 24px;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+}
+
+.app-card.use-case-card {
+  background:rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 12px 0px;
+  backdrop-filter: blur(12px);
+}
+
+.app-card.dashboard-mockup {
+  background:rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 12px 24px;
+  backdrop-filter: blur(12px);
+  margin-bottom: 20px;
+}
+
