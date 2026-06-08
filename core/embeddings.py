@@ -52,7 +52,7 @@ def update_tracker(file_name: str, file_hash: str):
             """),
             {"file_name": file_name, "file_hash": file_hash}
         )
-        conn.commit()
+        # conn.commit()
 
 def remove_tracker(file_name: str):
     with engine.connect() as conn:
@@ -60,7 +60,7 @@ def remove_tracker(file_name: str):
             text("DELETE FROM docs_embedding_tracker WHERE file_name = :file_name"),
             {"file_name": file_name}
         )
-        conn.commit()
+        # conn.commit()
 
 def embed_text(text: str) -> list:
     return emb_model.encode(text).tolist()
@@ -154,7 +154,7 @@ def embed_single_file(filepath: str, force: bool = False):
                     "embedding": str(embedding)
                 }
             )
-        conn.commit()
+        # conn.commit()
 
     update_tracker(file_name, file_hash)
     print(f"[OK] {file_name} → {len(chunks)} chunks disimpan")
