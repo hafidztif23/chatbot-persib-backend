@@ -1,0 +1,10 @@
+Harga Keanggotaan Persib:
+
+MemberSIB adalah program keanggotaan digital Persib untuk supporter umum.
+Harga MemberSIB adalah Rp11.000 per bulan.
+Terdapat dua kategori: MemberSIB Putih dan MemberSIB Biru.
+
+Passport Persib adalah program keanggotaan premium Persib dengan benefit lebih eksklusif.
+Harga Passport Persib adalah Rp5.500.000.
+Passport Persib memberikan akses ke berbagai keuntungan eksklusif seperti tiket VIP,
+akses pusat latihan, welcome box, diskon merchandise 20%, dan banyak lagi.
