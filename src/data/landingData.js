@@ -1,12 +1,12 @@
-import ticketingImg from "../images/ticketing.jpg";
-import membershipImg from "../images/membership.jpg";
-import scheduleImg from "../images/schedule.jpg";
-import merchImg from "../images/merch.png";
-import stadiumImg from "../images/stadium.jpg";
-import instagramIcon from "../images/instagram2.jpg";
-import linkedinIcon from "../images/linkedin.png";
-import youtubeIcon from "../images/youtube2.jpg";
-import twitterIcon from "../images/X2.jpg";
+import ticketingImg from "../image/ticketing.jpg";
+import membershipImg from "../image/membership.jpg";
+import scheduleImg from "../image/schedule.jpg";
+import merchImg from "../image/merch.png";
+import stadiumImg from "../image/stadium.jpg";
+import instagramIcon from "../image/instagram2.jpg";
+import linkedinIcon from "../image/linkedin.png";
+import youtubeIcon from "../image/youtube2.jpg";
+import twitterIcon from "../image/X2.jpg";
 
 export const landingData = {
   navLinks: [

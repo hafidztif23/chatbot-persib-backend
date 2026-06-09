@@ -6,7 +6,7 @@ import UseCaseSection from '../components/landing/UseCaseSection';
 import FAQSection from '../components/landing/FAQSection';
 import CTASection from '../components/landing/CTASection';
 import Footer from '../components/landing/Footer';
-import heroBg2 from "../assets/images/hero-bg2.jpg";
+import heroBg2 from "../image/hero-bg2.jpg";
 import '../styles/landing.css';
 
 const LandingPage = () => {

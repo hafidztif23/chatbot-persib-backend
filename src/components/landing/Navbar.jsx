@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
 import Button from '../common/Button';
 import { landingData } from '../../data/landingData';
-import logoPersib from '../../images/persib-logo.png';
+import logoPersib from '../../image/persib-logo.png';
 import '../../styles/landing.css';
 
 const Navbar = () => {

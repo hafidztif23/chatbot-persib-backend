@@ -1,5 +1,5 @@
 import React from 'react';
-import persibLogo from "../../images/persib-logo.png";
+import persibLogo from "../../image/persib-logo.png";
 import { landingData } from "../../data/landingData";
 
 const Footer = () => {
