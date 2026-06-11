@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from core.storage import sync_docs_from_gcs
 from routes import status, intents, merch, chat, jadwal, pemain, search, ticket
 from routes.auth import router as auth_router
 from routes.eskalasi import router as eskalasi_router
@@ -26,6 +27,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup():
+    sync_docs_from_gcs()
     # Hanya embed file yang belum di-embed atau ada perubahan
     print("Mengecek embeddings dokumen...")
     store_embeddings_from_docs()

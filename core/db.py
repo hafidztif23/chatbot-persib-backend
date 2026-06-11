@@ -4,31 +4,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Try PostgreSQL first, fallback to SQLite if not available
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("DB_NAME")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-try:
-    # Try PostgreSQL connection
-    if DB_USER and DB_PASS and DB_NAME:
-        DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-        engine = create_engine(DATABASE_URL)
-        # Test connection
-        with engine.connect() as conn:
-            conn.execute(text("SELECT 1"))
-        print("✓ Connected to PostgreSQL")
-    else:
-        raise Exception("Missing PostgreSQL credentials")
-except Exception as e:
-    print(f"⚠️  PostgreSQL connection failed: {e}")
-    print("↓ Falling back to SQLite...")
-    # Fallback to SQLite
-    DATABASE_URL = "sqlite:///./chatbot.db"
-    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-    print("✓ Using SQLite database")
+if DATABASE_URL:
+    engine = create_engine(DATABASE_URL)
+    print("✓ Connected to Cloud SQL PostgreSQL")
+else:
+    # Fallback ke SQLite untuk development lokal
+    engine = create_engine(
+        "sqlite:///./chatbot.db",
+        connect_args={"check_same_thread": False}
+    )
+    print("⚠ DATABASE_URL tidak ditemukan, menggunakan SQLite")
 
 def check_merch_stock(item_name: str):
     item_name = item_name.strip().title()

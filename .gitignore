@@ -3,4 +3,4 @@ __pycache__
 venv
 test_llm.py
 node_modules
-.env
+cloud-sql-proxy.exe
