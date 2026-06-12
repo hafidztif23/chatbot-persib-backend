@@ -1,21 +1,44 @@
 import os
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
+from google.cloud.sql.connector import Connector
 
 load_dotenv()
 
+INSTANCE_CONNECTION_NAME = os.getenv("INSTANCE_CONNECTION_NAME")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_NAME = os.getenv("DB_NAME", "maungbot")
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if DATABASE_URL:
+if INSTANCE_CONNECTION_NAME and DB_PASSWORD:
+    # Production: pakai Cloud SQL Python Connecto
+
+    connector = Connector()
+
+    def getconn():
+        return connector.connect(
+            INSTANCE_CONNECTION_NAME,
+            "pg8000",
+            user=DB_USER,
+            password=DB_PASSWORD,
+            db=DB_NAME,
+        )
+
+    engine = create_engine("postgresql+pg8000://", creator=getconn)
+    print("✓ Connected to Cloud SQL via Python Connector")
+
+elif DATABASE_URL:
     engine = create_engine(DATABASE_URL)
-    print("✓ Connected to Cloud SQL PostgreSQL")
+    print("✓ Connected via DATABASE_URL")
+
 else:
-    # Fallback ke SQLite untuk development lokal
+    # Fallback lokal: SQLite
     engine = create_engine(
         "sqlite:///./chatbot.db",
         connect_args={"check_same_thread": False}
     )
-    print("⚠ DATABASE_URL tidak ditemukan, menggunakan SQLite")
+    print("⚠ Menggunakan SQLite (development)")
 
 def check_merch_stock(item_name: str):
     item_name = item_name.strip().title()
