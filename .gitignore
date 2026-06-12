@@ -5,4 +5,5 @@ test_llm.py
 node_modules
 cloud-sql-proxy.exe
 github-actions-key.json
-docs/*
+docs
+.firebase
