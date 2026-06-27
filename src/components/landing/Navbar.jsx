@@ -39,15 +39,14 @@ const Navbar = () => {
         </div>
         
         <div className="navbar-actions">
-          <Link to="/profile" className="login-link" onClick={closeMenu}>Login</Link>
           <Button 
             variant="primary" 
             onClick={() => { 
               closeMenu(); 
-              navigate('/profile'); 
+              navigate('/login'); 
             }}
           >
-            Try Maung Bot
+            Login
           </Button>
         </div>
       </div>

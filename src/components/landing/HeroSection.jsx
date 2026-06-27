@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../common/Button';
 import heroBg from "../../image/hero-bg.jpg";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <section className="hero-section" style={{ backgroundImage: `linear-gradient(rgba(0,20,60,0.75),rgba(0,10,40,0.85)),url(${heroBg})` }}>
       <div className="hero-container">
@@ -14,7 +16,9 @@ const HeroSection = () => {
             Tanya apa saja seputar ketersediaan tiket, jadwal laga, hingga info keanggotaan Persib. Maung Bot hadir memberi jawaban akurat dan instan dari sumber resmi.
           </p>
           <div className="hero-buttons">
-            <Button variant="primary">Uji Coba Maung Bot</Button>
+            <Button variant="primary" onClick={() => navigate('/login')}>
+              Login
+            </Button>
             <Button variant="outline">Pelajari Cara Kerjanya &rarr;</Button>
           </div>
         </div>
