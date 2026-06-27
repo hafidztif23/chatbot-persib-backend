@@ -1,15 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from core.storage import sync_docs_from_gcs
 from routes import status, intents, merch, chat, jadwal, pemain, search, ticket
 from routes.auth import router as auth_router
 from routes.eskalasi import router as eskalasi_router
+from routes.docs import router as docs_router
 from core.embeddings import store_embeddings_from_docs
 from core.docs_watcher import start_docs_watcher
 
 app = FastAPI(title="Chatbot Persib API")
 
-# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -27,18 +26,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.on_event("startup")
 def startup():
-    sync_docs_from_gcs()
-    # Hanya embed file yang belum di-embed atau ada perubahan
-    print("Mengecek embeddings dokumen...")
+    # Embed semua dokumen dari GCS (skip kalau hash sama)
+    print("[STARTUP] Mengecek embeddings dokumen dari GCS...")
     store_embeddings_from_docs()
-    print("Pengecekan selesai.")
+    print("[STARTUP] Pengecekan selesai.")
 
-    # Jalankan watcher di background
-    start_docs_watcher(docs_folder="docs")
+    # Jalankan polling watcher GCS di background
+    start_docs_watcher()
+
 
 app.include_router(auth_router)
+app.include_router(docs_router)
 app.include_router(status.router)
 app.include_router(intents.router)
 app.include_router(merch.router)

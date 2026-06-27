@@ -1,57 +1,71 @@
 import os
-import time
 import threading
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-from core.embeddings import embed_single_file, remove_tracker
-from core.db import engine
+import time
 from sqlalchemy import text
+from core.db import engine
 
-SUPPORTED_EXT = {".txt", ".pdf", ".xlsx", ".xls", ".docx"}
+POLL_INTERVAL = int(os.getenv("GCS_POLL_INTERVAL", "30"))  # detik
 
-class DocsEventHandler(FileSystemEventHandler):
 
-    def _is_supported(self, filepath: str) -> bool:
-        ext = os.path.splitext(filepath)[1].lower()
-        return ext in SUPPORTED_EXT
+def _remove_embeddings_from_db(file_name: str):
+    from core.embeddings import remove_tracker
+    with engine.begin() as conn:
+        conn.execute(
+            text("DELETE FROM document_embeddings WHERE source_file = :n"),
+            {"n": file_name}
+        )
+    remove_tracker(file_name)
+    print(f"[WATCHER] Embeddings dihapus untuk: {file_name}")
 
-    def on_created(self, event):
-        if event.is_directory or not self._is_supported(event.src_path):
-            return
-        file_name = os.path.basename(event.src_path)
-        print(f"[WATCHER] File baru terdeteksi: {file_name}")
-        # Delay singkat agar file selesai ditulis sebelum dibaca
-        time.sleep(1)
-        embed_single_file(event.src_path)
 
-    def on_modified(self, event):
-        if event.is_directory or not self._is_supported(event.src_path):
-            return
-        file_name = os.path.basename(event.src_path)
-        print(f"[WATCHER] Perubahan terdeteksi: {file_name}")
-        time.sleep(1)
-        embed_single_file(event.src_path)
+def start_docs_watcher():
+    def poll():
+        from core.storage import get_all_doc_hashes, download_doc_bytes
+        from core.embeddings import embed_single_file_from_bytes, compute_md5
 
-    def on_deleted(self, event):
-        if event.is_directory or not self._is_supported(event.src_path):
-            return
-        file_name = os.path.basename(event.src_path)
-        with engine.connect() as conn:
-            conn.execute(
-                text("DELETE FROM document_embeddings WHERE source_file = :file_name"),
-                {"file_name": file_name}
-            )
-            conn.commit()
-        print(f"[WATCHER] File dihapus: {file_name}")
-        remove_tracker(file_name)
+        known_hashes: dict[str, str] = {}
+        print(f"[WATCHER] Memulai polling GCS setiap {POLL_INTERVAL}s...")
 
-def start_docs_watcher(docs_folder: str = "docs"):
-    event_handler = DocsEventHandler()
-    observer = Observer()
-    observer.schedule(event_handler, path=docs_folder, recursive=False)
+        # Inisialisasi state awal tanpa re-embed (sudah di-embed saat startup)
+        try:
+            known_hashes = get_all_doc_hashes()
+        except Exception as e:
+            print(f"[WATCHER] Gagal inisialisasi state awal: {e}")
 
-    thread = threading.Thread(target=observer.start, daemon=True)
+        while True:
+            time.sleep(POLL_INTERVAL)
+            try:
+                current_hashes = get_all_doc_hashes()
+                current_names = set(current_hashes.keys())
+                known_names = set(known_hashes.keys())
+
+                # File baru atau berubah
+                for name in current_names:
+                    old_hash = known_hashes.get(name)
+                    new_hash = current_hashes[name]
+                    if old_hash != new_hash:
+                        action = "baru" if old_hash is None else "berubah"
+                        print(f"[WATCHER] File {action}: {name}")
+                        try:
+                            file_bytes = download_doc_bytes(name)
+                            embed_single_file_from_bytes(name, file_bytes)
+                        except Exception as e:
+                            print(f"[WATCHER ERROR] {name}: {e}")
+
+                # File dihapus dari GCS
+                for name in known_names - current_names:
+                    print(f"[WATCHER] File dihapus dari GCS: {name}")
+                    try:
+                        _remove_embeddings_from_db(name)
+                    except Exception as e:
+                        print(f"[WATCHER ERROR] hapus embedding {name}: {e}")
+
+                known_hashes = current_hashes
+
+            except Exception as e:
+                print(f"[WATCHER POLL ERROR] {e}")
+
+    thread = threading.Thread(target=poll, daemon=True)
     thread.start()
-
-    print(f"[WATCHER] Memantau folder '{docs_folder}' untuk perubahan...")
-    return observer
+    print("[WATCHER] Thread polling GCS dimulai")
+    return thread
