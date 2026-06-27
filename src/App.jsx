@@ -1,75 +1,43 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+
+// Component Rekan Kamu
 import Chatbot from './components/Chatbot'
 import SignUp from './components/SignUp'
 import Login from './components/Login'
 import { tokenManager } from './services/api'
+
+// Component Lokal Kamu
+import LandingPage from './pages/LandingPage'
+import Profile from './pages/Profile'
+import Settings from './pages/Settings'
+
 import './App.css'
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('loading')
+  // Cek status login
+  const isLoggedIn = tokenManager.isLoggedIn()
 
-  useEffect(() => {
-    const updateRoute = () => {
-      const path = window.location.pathname
-      const isLoggedIn = tokenManager.isLoggedIn()
-
-      // Jika path adalah /login atau /signup, tampilkan halaman tersebut
-      if (path === '/login' || path === '/login/') {
-        setCurrentPage('login')
-      } else if (path === '/signup' || path === '/signup/') {
-        setCurrentPage('signup')
-      } else {
-        // Untuk path lain (/) - check apakah sudah login
-        if (isLoggedIn) {
-          setCurrentPage('chatbot')
-        } else {
-          // Belum login, redirect ke /login
-          window.history.pushState({}, '', '/login')
-          setCurrentPage('login')
-        }
-      }
-    }
-
-    // Update route saat component mount
-    updateRoute()
-
-    // Handle link clicks
-    const handleLinkClick = (e) => {
-      const target = e.target.closest('a')
-      if (target && target.href.includes(window.location.origin)) {
-        const href = target.getAttribute('href')
-        if (href && href.startsWith('/')) {
-          e.preventDefault()
-          window.history.pushState({}, '', href)
-          updateRoute()
-        }
-      }
-    }
-
-    // Handle browser back/forward buttons
-    const handlePopState = () => {
-      updateRoute()
-    }
-
-    document.addEventListener('click', handleLinkClick)
-    window.addEventListener('popstate', handlePopState)
-
-    return () => {
-      document.removeEventListener('click', handleLinkClick)
-      window.removeEventListener('popstate', handlePopState)
-    }
-  }, [])
-
-  if (currentPage === 'loading') {
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '18px', color: '#666' }}>Loading...</div>
-  }
-
+  // PERHATIKAN: Kita langsung me-return <BrowserRouter> di sini
   return (
-    <div className="App">
-      {currentPage === 'chatbot' && <Chatbot />}
-      {currentPage === 'signup' && <SignUp />}
-      {currentPage === 'login' && <Login />}
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Rute Utama & Lokal */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
+
+        {/* Rute Auth (Login/Signup) */}
+        <Route path="/login" element={!isLoggedIn ? <Login /> : <Navigate to="/chat" replace />} />
+        <Route path="/signup" element={!isLoggedIn ? <SignUp /> : <Navigate to="/chat" replace />} />
+
+        {/* Rute Chatbot */}
+        <Route path="/chat" element={isLoggedIn ? <Chatbot /> : <Navigate to="/login" replace />} />
+
+        {/* Rute Sapu Jagat jika URL ngawur */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 

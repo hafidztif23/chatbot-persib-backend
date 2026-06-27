@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.git/
+docs/
+*.pdf
+cloud-sql-proxy.exe
+node_modules/
+github-actions-key.json
