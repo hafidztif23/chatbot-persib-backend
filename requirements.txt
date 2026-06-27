@@ -22,3 +22,4 @@ python-jose[cryptography]
 email-validator
 google-cloud-storage
 cloud-sql-python-connector[pg8000]
+python-multipart
