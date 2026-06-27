@@ -60,7 +60,7 @@
 
 body {
   font-family: var(--sans);
-  background: #f5f7fb; /* Mempertahankan warna background milik rekanmu */
+  background: #0A0F1C;
   min-height: 100vh;
   /* OVERFLOW HIDDEN DIHAPUS AGAR BISA SCROLL */
 }
