@@ -15,12 +15,12 @@
   padding: 0 16px;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.08);
-  background: #1a2040;
+  background: rgba(30, 41, 59, 0.8);
   color: white;
   cursor: pointer;
 }
 
 .custom-select select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: rgba(37, 99, 235, 0.5);
 }

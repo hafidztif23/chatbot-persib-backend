@@ -1,10 +1,10 @@
 :root {
-  --primary-blue: #0d3fb5;
-  --sidebar-bg: #04111f;
-  --card-bg: #0b3ab8;
+  --primary-blue: #2563EB;
+  --sidebar-bg: #0F172A;
+  --card-bg: rgba(30, 41, 59, 0.6);
   --white: #ffffff;
-  --text-secondary: #b8c2d6;
-  --button-primary: #c5a5ff;
+  --text-secondary: #9CA3AF;
+  --button-primary: #2563EB;
   --border-color: rgba(255, 255, 255, 0.08);
   --radius-sm: 8px;
   --radius-md: 12px;

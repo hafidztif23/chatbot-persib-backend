@@ -1,12 +1,6 @@
 function ProfileTabs({ activeTab, setActiveTab }) {
   const tabs = [
     { id: "details", label: "Profile Details" },
-    { id: "preferences", label: "Preferences" },
-    { id: "usage", label: "Usage" },
-    { id: "billing", label: "Plan & Billing" },
-    { id: "team", label: "Team" },
-    { id: "integrations", label: "Integrations" },
-    { id: "api", label: "API Dashboard" },
   ];
 
   return (

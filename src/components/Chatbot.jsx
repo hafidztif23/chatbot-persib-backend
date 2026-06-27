@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import './Chatbot.css'
 import PersibLogo from '../image/Logo_Persib_Bandung.png'
 import { chatAPI, tokenManager } from '../services/api'
@@ -132,25 +133,20 @@ function Chatbot() {
 
         <div className="cb-sidebar-menu">
           <h4>MENU UTAMA</h4>
-          <div className="cb-menu-item active">💬 Chat Sekarang</div>
+          <Link to="/chat" className="cb-menu-item active" onClick={() => setIsSidebarOpen(false)}>
+            💬 Chat Sekarang
+          </Link>
         </div>
 
         <div className="cb-sidebar-footer">
           <h4>USER</h4>
-          {user && (
-            <div className="cb-user-info">
-              <p className="cb-user-name"><strong>{user.nama_lengkap}</strong></p>
-              <p className="cb-user-email">{user.email}</p>
-              <p className="cb-user-membership">Member: <span>{user.membership}</span></p>
-            </div>
-          )}
+          <Link to="/profile" className="cb-menu-item" onClick={() => setIsSidebarOpen(false)}>
+            👤 Edit Profil
+          </Link>
           <h4>PENGATURAN</h4>
-          <div className="cb-settings-item">
-            <span>🎵 Tone</span>
-          </div>
-          <div className="cb-settings-item">
-            <span>🌐 Language</span>
-          </div>
+          <Link to="/settings" className="cb-settings-item" onClick={() => setIsSidebarOpen(false)}>
+            <span>⚙️ Settings</span>
+          </Link>
         </div>
 
         <button className="cb-logout-btn" onClick={handleLogout}>Keluar</button>

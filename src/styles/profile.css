@@ -79,10 +79,11 @@
 }
 /* ===================== CARD & FORM ===================== */
 .profile-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   padding: 32px;
+  backdrop-filter: blur(12px);
 }
 
 .profile-avatar {
@@ -108,9 +109,9 @@
   bottom: -8px;
   width: 28px;
   height: 28px;
-  border: 2px solid #a3b9f0;
+  border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
-  background: #3B82F6;
+  background: #2563EB;
   color: white;
   cursor: pointer;
   display: flex;
@@ -120,7 +121,7 @@
 }
 
 .avatar-edit-btn:hover {
-  background: #2563EB;
+  background: #1D4ED8;
 }
 
 .profile-section {
@@ -160,8 +161,8 @@
   width: 100%;
   height: 48px;
   padding: 0 16px;
-  background: #1E293B;
-  border: 1px solid #334155;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   color: white;
   font-size: 14px;
@@ -169,7 +170,9 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: #8B5CF6;
+  background: #1E293B;
+  border-color: rgba(37, 99, 235, 0.5);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.15);
 }
 
 .profile-divider {
@@ -186,7 +189,7 @@
 }
 
 .profile-update-btn {
-  background: linear-gradient(to right, #8B5CF6, #6366F1);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
   color: white;
   border: none;
   padding: 12px 28px;
@@ -194,10 +197,14 @@
   font-weight: 500;
   cursor: pointer;
   font-size: 14px;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  transition: all 0.2s ease;
 }
 
 .profile-update-btn:hover {
-  opacity: 0.9;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+  transform: translateY(-1px);
 }
 
 /* ==================== RESPONSIVE ==================== */

@@ -5,12 +5,12 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background-color: #003399;
+  background-color: #0A0F1C;
 }
 
 .sidebar {
   width: 280px;
-  background-color: #002266;
+  background-color: #0F172A;
   height: 100vh;
   flex-shrink: 0;
   transition: all 0.3s ease;
@@ -22,7 +22,9 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: #003399;
+  background: radial-gradient(circle at 80% 10%, rgba(37, 99, 235, 0.12), transparent 45%),
+              radial-gradient(circle at 15% 85%, rgba(79, 70, 229, 0.08), transparent 45%),
+              #0A0F1C;
 }
 
 .dashboard-main {
@@ -53,4 +55,12 @@
   .dashboard-main { 
     padding: 16px; 
   }
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 99;
 }
