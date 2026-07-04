@@ -29,7 +29,7 @@ function Login() {
       await login(formData.email, formData.password)
       setSuccessMessage('Login berhasil! Redirect ke chatbot...')
       setTimeout(() => {
-        window.location.href = '/'
+        window.location.href = '/chat'
       }, 1500)
     } catch (err) {
       // Error sudah ditangani di useAuth

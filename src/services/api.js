@@ -121,7 +121,7 @@ export const authAPI = {
   logout: () => {
     removeToken()
     removeUser()
-    window.location.href = '/login'
+    window.location.href = '/'
   },
 }
 

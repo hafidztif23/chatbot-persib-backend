@@ -1,15 +1,19 @@
 import { useState } from "react";
-import userData from "../../data/userData";
-import ProfileAvatar from "./ProfileAvatar";
+import { tokenManager, authAPI } from "../../services/api";
 import ProfileInfoSection from "./ProfileInfoSection";
 import PasswordSection from "./PasswordSection";
 import Button from "../common/Button";
 
 function ProfileForm() {
-  // Mengambil data dari localStorage saat pertama kali load
+  // Mengambil data dari tokenManager saat pertama kali load
   const [formData, setFormData] = useState(() => {
-    const savedData = localStorage.getItem("userProfile");
-    return savedData ? JSON.parse(savedData) : userData;
+    const user = tokenManager.getUser();
+    return {
+      name: user?.nama_lengkap || "",
+      email: user?.email || "",
+      password: "",
+      confirmPassword: ""
+    };
   });
 
   const handleInputChange = (e) => {
@@ -20,7 +24,7 @@ function ProfileForm() {
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.password?.trim() || !formData.confirmPassword?.trim()) {
       alert("❌ Kolom Password dan Confirm Password wajib diisi!");
       return;
@@ -31,13 +35,32 @@ function ProfileForm() {
       return;
     }
 
-    localStorage.setItem("userProfile", JSON.stringify(formData));
-    alert("✨ Profil berhasil disimpan di browser!");
+    try {
+      await authAPI.updateProfile({
+        nama_lengkap: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
+
+      // Update local storage user info
+      const currentUser = tokenManager.getUser() || {};
+      const updatedUser = {
+        ...currentUser,
+        nama_lengkap: formData.name,
+        email: formData.email
+      };
+      tokenManager.setUser(updatedUser);
+      
+      alert("✨ Profil berhasil diperbarui!");
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      alert(`❌ Gagal memperbarui profil: ${error.message}`);
+    }
   };
 
   return (
     <div className="profile-card">
-      <ProfileAvatar />
       <ProfileInfoSection formData={formData} onChange={handleInputChange} />
       <div className="profile-divider"></div>
       <PasswordSection formData={formData} onChange={handleInputChange} />

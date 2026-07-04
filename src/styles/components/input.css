@@ -22,7 +22,7 @@
   padding: 0 16px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #1a2040;
+  background: rgba(30, 41, 59, 0.8);
   color: white;
   transition: 0.2s ease;
   box-sizing: border-box; 
@@ -39,8 +39,9 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  background: #1E293B;
+  border-color: rgba(37, 99, 235, 0.5);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.15);
 }
 
 .toggle-password {

@@ -24,8 +24,8 @@ function App() {
       <Routes>
         {/* Rute Utama & Lokal */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" replace />} />
+        <Route path="/settings" element={isLoggedIn ? <Settings /> : <Navigate to="/login" replace />} />
 
         {/* Rute Auth (Login/Signup) */}
         <Route path="/login" element={!isLoggedIn ? <Login /> : <Navigate to="/chat" replace />} />
