@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from routes import status, intents, merch, chat, jadwal, pemain, search, ticket
 from routes.auth import router as auth_router
 from routes.eskalasi import router as eskalasi_router
@@ -8,6 +10,21 @@ from core.embeddings import store_embeddings_from_docs
 from core.docs_watcher import start_docs_watcher
 
 app = FastAPI(title="Chatbot Persib API")
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = exc.errors()
+    msg = errors[0].get("msg", "Input tidak valid.") if errors else "Input tidak valid."
+    msg = msg.replace("Value error, ", "")
+    return JSONResponse(
+        status_code=422,
+        content={
+            "intent": "error",
+            "score": 0.0,
+            "response": msg,
+            "escalated": False
+        }
+    )
 
 app.add_middleware(
     CORSMiddleware,
