@@ -77,32 +77,4 @@ export const landingData = {
     { href: "https://apps.apple.com/id/app/persib/id1240095475?l=id", icon: appStoreBadge, label: "App Store" }, 
     { href: "https://play.google.com/store/apps/details?id=com.persib.persibpass&hl=id", icon: googlePlayBadge, label: "Google Play" } 
   ],
-  footerLinks: [
-    {
-      title: "Produk",
-      items: [
-        { label: "Fitur Utama", href: "#" },
-        { label: "AI Legends", href: "#" },
-        { label: "Tiket VIP", href: "#" },
-        { label: "Merchandise", href: "#" },
-      ]
-    },
-    {
-      title: "Perusahaan",
-      items: [
-        { label: "Tentang Kami", href: "#" },
-        { label: "Karier", href: "#" },
-        { label: "Kontak", href: "#" },
-        { label: "Press Kit", href: "#" },
-      ]
-    },
-    {
-      title: "Legal",
-      items: [
-        { label: "Privasi", href: "#" },
-        { label: "Ketentuan", href: "#" },
-        { label: "Keamanan", href: "#" },
-      ]
-    }
-  ]
 };

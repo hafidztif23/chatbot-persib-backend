@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
   return (
-    // Atribut style dihapus, kita akan atur warnanya murni lewat CSS
     <section id="home" className="hero-section">
       <div className="hero-container">
         <div className="hero-content">

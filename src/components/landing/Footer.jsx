@@ -9,24 +9,19 @@ const Footer = () => {
     <footer className="footer" id="contact">
       <div className="footer-content">
         
-        {/* BLOK 1: Logo */}
         <div className="footer-col logo-col">
           <img src={persibLogo} alt="Persib Logo" className="footer-logo-img"/>
         </div>
 
-        {/* GARIS PEMISAH */}
         <div className="vertical-divider"></div>
 
-        {/* BLOK 2: Email */}
         <div className="footer-col email-col">
           <span className="col-title">EMAIL</span>
           <a href="mailto:info@persib.co.id" className="email-link">info@persib.co.id</a>
         </div>
 
-        {/* GARIS PEMISAH */}
         <div className="vertical-divider"></div>
 
-        {/* BLOK 3: Media Sosial */}
         <div className="footer-col social-col">
           <span className="col-title">MEDIA SOSIAL</span>
           <div className="social-icons">
@@ -38,10 +33,8 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* GARIS PEMISAH */}
         <div className="vertical-divider"></div>
 
-        {/* BLOK 4: Unduh Aplikasi */}
         <div className="footer-col app-col">
           <span className="col-title">UNDUH APLIKASI</span>
           <div className="app-badges">
