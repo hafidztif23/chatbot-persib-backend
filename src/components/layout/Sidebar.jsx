@@ -11,6 +11,8 @@ function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation();
   const currentPath = location.pathname;
 
+  const isAdmin = user?.role === 'admin' || user?.email?.endsWith('@persib.co.id') || user?.email?.includes('admin');
+
   const handleLogout = () => {
     logout();
   };
@@ -29,21 +31,27 @@ function Sidebar({ isOpen, setIsOpen }) {
         </button>
       </div>
 
-      <button className="cb-new-chat-btn" onClick={() => {
-        navigate("/chat");
-        setIsOpen(false);
-      }}>
-        <span>➕ Obrolan Baru</span>
-      </button>
+      {!isAdmin && (
+        <button className="cb-new-chat-btn" onClick={() => {
+          navigate("/chat");
+          setIsOpen(false);
+        }}>
+          <span>➕ Obrolan Baru</span>
+        </button>
+      )}
 
       <div className="cb-sidebar-menu">
         <h4>MENU UTAMA</h4>
-        <Link to="/chat" className={`cb-menu-item ${currentPath === '/chat' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
-          💬 Chat Sekarang
-        </Link>
-        <Link to="/knowledge-base" className={`cb-menu-item ${currentPath === '/knowledge-base' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
-          💬 Knowledge Base
-        </Link>
+        {!isAdmin && (
+          <Link to="/chat" className={`cb-menu-item ${currentPath === '/chat' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
+            💬 Chat Sekarang
+          </Link>
+        )}
+        {isAdmin && (
+          <Link to="/knowledge-base" className={`cb-menu-item ${currentPath === '/knowledge-base' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
+            💬 Knowledge Base
+          </Link>
+        )}
       </div>
 
       <div className="cb-sidebar-footer">

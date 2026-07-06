@@ -85,6 +85,7 @@ def _format_account(row: dict) -> dict:
         "jenis_kelamin": row["jenis_kelamin"],
         "kota":          row["kota"],
         "membership":    row["membership"],
+        "role":          row.get("role"),
         "created_at":    str(row["created_at"]) if row.get("created_at") else None,
     }
 

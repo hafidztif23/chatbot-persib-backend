@@ -99,6 +99,7 @@ function Chatbot() {
     }
     return names[0][0].toUpperCase()
   }
+  const isAdmin = user?.role === 'admin' || user?.email?.endsWith('@persib.co.id') || user?.email?.includes('admin');
 
   return (
     <div className="cb-main">
@@ -122,23 +123,29 @@ function Chatbot() {
           </button>
         </div>
 
-        <button className="cb-new-chat-btn" onClick={() => {
-          setIsNewChat(true)
-          setMessages([])
-          setInputMessage('')
-          setIsSidebarOpen(false)
-        }}>
-          <span>➕ Obrolan Baru</span>
-        </button>
+        {!isAdmin && (
+          <button className="cb-new-chat-btn" onClick={() => {
+            setIsNewChat(true)
+            setMessages([])
+            setInputMessage('')
+            setIsSidebarOpen(false)
+          }}>
+            <span>➕ Obrolan Baru</span>
+          </button>
+        )}
 
         <div className="cb-sidebar-menu">
           <h4>MENU UTAMA</h4>
-          <Link to="/chat" className="cb-menu-item active" onClick={() => setIsSidebarOpen(false)}>
-            💬 Chat Sekarang
-          </Link>
-          <Link to="/knowledge-base" className="cb-menu-item" onClick={() => setIsSidebarOpen(false)}>
-            💬 Knowledge Base
-          </Link>
+          {!isAdmin && (
+            <Link to="/chat" className="cb-menu-item active" onClick={() => setIsSidebarOpen(false)}>
+              💬 Chat Sekarang
+            </Link>
+          )}
+          {isAdmin && (
+            <Link to="/knowledge-base" className="cb-menu-item" onClick={() => setIsSidebarOpen(false)}>
+              💬 Knowledge Base
+            </Link>
+          )}
         </div>
 
         <div className="cb-sidebar-footer">

@@ -18,6 +18,8 @@ import './App.css'
 function App() {
   // Cek status login
   const isLoggedIn = tokenManager.isLoggedIn()
+  const user = tokenManager.getUser()
+  const isAdmin = user?.role === 'admin' || user?.email?.endsWith('@persib.co.id') || user?.email?.includes('admin')
 
   // PERHATIKAN: Kita langsung me-return <BrowserRouter> di sini
   return (
@@ -27,14 +29,50 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" replace />} />
         <Route path="/settings" element={isLoggedIn ? <Settings /> : <Navigate to="/login" replace />} />
-        <Route path="/knowledge-base" element={isLoggedIn ? <KnowledgeBase /> : <Navigate to="/login" replace />} />
+        <Route 
+          path="/knowledge-base" 
+          element={
+            isLoggedIn ? (
+              isAdmin ? <KnowledgeBase /> : <Navigate to="/chat" replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          } 
+        />
 
         {/* Rute Auth (Login/Signup) */}
-        <Route path="/login" element={!isLoggedIn ? <Login /> : <Navigate to="/chat" replace />} />
-        <Route path="/signup" element={!isLoggedIn ? <SignUp /> : <Navigate to="/chat" replace />} />
+        <Route 
+          path="/login" 
+          element={
+            !isLoggedIn ? (
+              <Login />
+            ) : (
+              isAdmin ? <Navigate to="/knowledge-base" replace /> : <Navigate to="/chat" replace />
+            )
+          } 
+        />
+        <Route 
+          path="/signup" 
+          element={
+            !isLoggedIn ? (
+              <SignUp />
+            ) : (
+              isAdmin ? <Navigate to="/knowledge-base" replace /> : <Navigate to="/chat" replace />
+            )
+          } 
+        />
 
         {/* Rute Chatbot */}
-        <Route path="/chat" element={isLoggedIn ? <Chatbot /> : <Navigate to="/login" replace />} />
+        <Route 
+          path="/chat" 
+          element={
+            isLoggedIn ? (
+              !isAdmin ? <Chatbot /> : <Navigate to="/knowledge-base" replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          } 
+        />
 
         {/* Rute Sapu Jagat jika URL ngawur */}
         <Route path="*" element={<Navigate to="/" replace />} />

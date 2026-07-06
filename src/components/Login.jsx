@@ -26,11 +26,20 @@ function Login() {
     setSuccessMessage('')
     
     try {
-      await login(formData.email, formData.password)
-      setSuccessMessage('Login berhasil! Redirect ke chatbot...')
-      setTimeout(() => {
-        window.location.href = '/chat'
-      }, 1500)
+      const response = await login(formData.email, formData.password)
+      const userRole = response.account?.role
+      const isAdmin = userRole === 'admin' || formData.email.endsWith('@persib.co.id') || formData.email.includes('admin')
+      if (isAdmin) {
+        setSuccessMessage('Login berhasil! Redirect ke Knowledge Base...')
+        setTimeout(() => {
+          window.location.href = '/knowledge-base'
+        }, 1500)
+      } else {
+        setSuccessMessage('Login berhasil! Redirect ke chatbot...')
+        setTimeout(() => {
+          window.location.href = '/chat'
+        }, 1500)
+      }
     } catch (err) {
       // Error sudah ditangani di useAuth
       console.error('Login error:', err)
