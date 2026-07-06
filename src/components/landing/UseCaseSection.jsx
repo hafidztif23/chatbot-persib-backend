@@ -60,7 +60,6 @@ const UseCaseSection = () => {
               <div className="use-case-content">
                 <h4 className="use-case-title">{useCase.title}</h4>
                 <p className="use-case-desc">{displayDesc}</p>
-                <button className="use-case-btn">Tanya Info Ini</button>
               </div>
             </div>
           );

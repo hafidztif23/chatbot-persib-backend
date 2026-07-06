@@ -1,13 +1,15 @@
 import ticketingImg from "../image/ticketing.jpg";
 import membershipImg from "../image/membership.jpg";
 import scheduleImg from "../image/schedule.jpg";
-import merchImg from "../image/merch.png";
+import merchImg from "../image/persib-logo2.png";
 import stadiumImg from "../image/stadium.jpg";
 import instagramIcon from "../image/instagram3.png";
 import linkedinIcon from "../image/linkedin3.png";
 import youtubeIcon from "../image/youtube2.png";
 import twitterIcon from "../image/X2.png";
 import facebookIcon from "../image/facebook2.png";
+import appStoreBadge from "../image/app-store.png"; 
+import googlePlayBadge from "../image/google-play.png";
 
 export const landingData = {
   navLinks: [
@@ -41,7 +43,7 @@ export const landingData = {
   ],
   useCases: [
     { image: ticketingImg, title: "Ticketing", desc: "How to buy" },
-    { image: membershipImg, title: "Membership", desc: "Benefits" },
+    { image: membershipImg, title: "MemberSIB", desc: "Benefits" },
     { image: scheduleImg, title: "Match Schedule", desc: "Who is next" },
     { image: merchImg, title: "Merchandise", desc: "Limited editions" },
     { image: stadiumImg, title: "Stadium Rules", desc: "Forbidden items" },
@@ -70,6 +72,10 @@ export const landingData = {
     { href: "https://x.com/persib", icon: twitterIcon, label: "X / Twitter" },
     { href: "https://id.linkedin.com/company/persib", icon: linkedinIcon, label: "LinkedIn" },
     { href: "https://www.youtube.com/channel/UCq9VjkTSRBvlyr0sSXwm8Kw", icon: youtubeIcon, label: "YouTube" },
+  ],
+  footerApps: [
+    { href: "https://apps.apple.com/id/app/persib/id1240095475?l=id", icon: appStoreBadge, label: "App Store" }, 
+    { href: "https://play.google.com/store/apps/details?id=com.persib.persibpass&hl=id", icon: googlePlayBadge, label: "Google Play" } 
   ],
   footerLinks: [
     {

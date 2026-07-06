@@ -1,11 +1,9 @@
 import React from 'react';
 import persibLogo from "../../image/persib-logo3.png";
-import appStoreBadge from "../../image/app-store.png"; 
-import googlePlayBadge from "../../image/google-play.png"; 
 import { landingData } from "../../data/landingData";
 
 const Footer = () => {
-  const { footerSocials } = landingData;
+  const { footerSocials, footerApps } = landingData;
 
   return (
     <footer className="footer" id="contact">
@@ -47,12 +45,11 @@ const Footer = () => {
         <div className="footer-col app-col">
           <span className="col-title">UNDUH APLIKASI</span>
           <div className="app-badges">
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              <img src={appStoreBadge} alt="App Store" className="app-badge" />
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              <img src={googlePlayBadge} alt="Google Play" className="app-badge" />
-            </a>
+            {footerApps.map((app) => (
+              <a key={app.label} href={app.href} target="_blank" rel="noopener noreferrer">
+                <img src={app.icon} alt={app.label} className="app-badge" />
+              </a>
+            ))} 
           </div>
         </div>
 

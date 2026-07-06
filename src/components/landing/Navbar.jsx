@@ -18,7 +18,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-        <img src={logoPersib} className="nav-logo-img" alt="Persib Logo" style={{ width: '32px', height: '32px' }} />
+        <img src={logoPersib} className="nav-logo-img" alt="Persib Logo"/>
         MAUNG BOT
       </div>
       
