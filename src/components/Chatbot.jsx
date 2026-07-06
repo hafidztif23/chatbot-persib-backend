@@ -136,6 +136,9 @@ function Chatbot() {
           <Link to="/chat" className="cb-menu-item active" onClick={() => setIsSidebarOpen(false)}>
             💬 Chat Sekarang
           </Link>
+          <Link to="/knowledge-base" className="cb-menu-item" onClick={() => setIsSidebarOpen(false)}>
+            💬 Knowledge Base
+          </Link>
         </div>
 
         <div className="cb-sidebar-footer">

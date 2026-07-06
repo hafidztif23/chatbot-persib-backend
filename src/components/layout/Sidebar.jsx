@@ -41,6 +41,9 @@ function Sidebar({ isOpen, setIsOpen }) {
         <Link to="/chat" className={`cb-menu-item ${currentPath === '/chat' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
           💬 Chat Sekarang
         </Link>
+        <Link to="/knowledge-base" className={`cb-menu-item ${currentPath === '/knowledge-base' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
+          💬 Knowledge Base
+        </Link>
       </div>
 
       <div className="cb-sidebar-footer">

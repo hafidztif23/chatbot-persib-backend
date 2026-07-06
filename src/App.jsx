@@ -11,6 +11,7 @@ import { tokenManager } from './services/api'
 import LandingPage from './pages/LandingPage'
 import Profile from './pages/Profile'
 import Settings from './pages/Settings'
+import KnowledgeBase from './pages/KnowledgeBase'
 
 import './App.css'
 
@@ -26,6 +27,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" replace />} />
         <Route path="/settings" element={isLoggedIn ? <Settings /> : <Navigate to="/login" replace />} />
+        <Route path="/knowledge-base" element={isLoggedIn ? <KnowledgeBase /> : <Navigate to="/login" replace />} />
 
         {/* Rute Auth (Login/Signup) */}
         <Route path="/login" element={!isLoggedIn ? <Login /> : <Navigate to="/chat" replace />} />
