@@ -1,10 +1,11 @@
 import io
 import os
 import mimetypes
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from fastapi.responses import StreamingResponse
+from core.dependencies import get_current_admin
 
-router = APIRouter(prefix="/documents", tags=["documents"])
+router = APIRouter(prefix="/documents", tags=["documents"], dependencies=[Depends(get_current_admin)])
 
 SUPPORTED_EXT = {".txt", ".pdf", ".xlsx", ".xls", ".docx"}
 

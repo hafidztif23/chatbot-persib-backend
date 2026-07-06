@@ -38,7 +38,7 @@ function Chatbot() {
     if (e) e.preventDefault()
     
     const textToSend = messageText || inputMessage
-    if (textToSend.trim() === '') return
+    if (textToSend.trim() === '' || textToSend.length > 500) return
 
     setIsNewChat(false)
 
@@ -253,15 +253,33 @@ function Chatbot() {
 
         {/* Input Form */}
         <form className="cb-chat-input-form" onSubmit={handleSendMessage}>
-          <input
-            type="text"
-            className="cb-chat-input"
-            placeholder="Ajukan Pertanyaan atau Mulai Obrolan..."
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            disabled={isLoading}
-          />
-          <button type="submit" className="cb-send-button" disabled={isLoading}>
+          <div style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column' }}>
+            <input
+              type="text"
+              className="cb-chat-input"
+              placeholder="Ajukan Pertanyaan atau Mulai Obrolan..."
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              disabled={isLoading}
+            />
+            {inputMessage.length > 400 && (
+              <span style={{ 
+                position: 'absolute', 
+                right: '12px', 
+                bottom: '-20px', 
+                fontSize: '11px', 
+                color: inputMessage.length > 500 ? '#ef4444' : '#e2e8f0',
+                transition: 'color 0.2s'
+              }}>
+                {inputMessage.length}/500
+              </span>
+            )}
+          </div>
+          <button 
+            type="submit" 
+            className="cb-send-button" 
+            disabled={isLoading || inputMessage.trim().length === 0 || inputMessage.length > 500}
+          >
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
               <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
             </svg>

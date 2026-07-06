@@ -54,3 +54,18 @@ def get_current_account(
         raise credentials_exception
 
     return dict(row)
+
+
+def get_current_admin(
+    account: dict = Depends(get_current_account),
+) -> dict:
+    """Dependency untuk memvalidasi bahwa account yang sedang login adalah admin."""
+    role = account.get("role")
+    is_admin = role == "admin" or account.get("email", "").endswith("@persib.co.id") or "admin" in account.get("email", "")
+    
+    if not is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Akses ditolak. Halaman ini hanya untuk Administrator.",
+        )
+    return account

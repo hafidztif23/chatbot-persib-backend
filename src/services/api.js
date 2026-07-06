@@ -34,8 +34,12 @@ const removeUser = () => {
 // Generic fetch function dengan auth
 const apiFetch = async (endpoint, options = {}) => {
   const headers = {
-    'Content-Type': 'application/json',
     ...options.headers,
+  }
+
+  // Omit Content-Type if sending FormData (browser handles boundaries)
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = headers['Content-Type'] || 'application/json'
   }
 
   const token = getToken()
@@ -135,6 +139,58 @@ export const chatAPI = {
       body: JSON.stringify({ query }),
     })
   },
+}
+
+// ============ DOCUMENTS API ============
+export const docsAPI = {
+  // List documents
+  listDocs: async () => {
+    return await apiFetch('/documents', {
+      method: 'GET',
+    })
+  },
+  
+  // Upload document
+  uploadDoc: async (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return await apiFetch('/documents', {
+      method: 'POST',
+      body: formData,
+    })
+  },
+  
+  // Delete document
+  deleteDoc: async (fileName) => {
+    return await apiFetch(`/documents/${encodeURIComponent(fileName)}`, {
+      method: 'DELETE',
+    })
+  },
+
+  // Download document
+  downloadDoc: async (fileName) => {
+    const token = getToken()
+    const headers = {}
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+    const response = await fetch(`${API_URL}/documents/download/${encodeURIComponent(fileName)}`, {
+      method: 'GET',
+      headers,
+    })
+    if (!response.ok) {
+      throw new Error('Gagal mendownload file')
+    }
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = fileName
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    window.URL.revokeObjectURL(url)
+  }
 }
 
 // ============ TOKEN MANAGEMENT ============

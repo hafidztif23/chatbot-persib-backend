@@ -1,145 +1,75 @@
 import { useState, useRef, useEffect } from "react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import "../styles/knowledgebase.css";
-
-// 12 Mock Documents for realistic pagination and display
-const INITIAL_DOCUMENTS = [
-  {
-    id: 1,
-    name: "Customer_Support_FAQ.pdf",
-    type: "PDF",
-    date: "Oct 24, 2023",
-    size: "2.4 MB",
-    status: "INDEXED",
-    content: "Q: Bagaimana cara reset password?\nA: Anda dapat melakukan reset password melalui menu profil atau halaman login dengan mengklik 'Lupa Password'.\n\nQ: Berapa lama pengiriman tiket merch?\nA: Pengiriman merchandise berkisar antara 2-5 hari kerja tergantung pada wilayah pengiriman."
-  },
-  {
-    id: 2,
-    name: "Product_Catalog_2024.docx",
-    type: "DOCX",
-    date: "Oct 28, 2023",
-    size: "4.8 MB",
-    status: "PROCESSING",
-    content: "KATALOG MERCHANDISE PERSIB 2024\n1. Jersey Home 2024 - Rp 450.000\n   Bahan premium breathable dry-fit, logo Persib woven HD, official merchandise tag.\n2. Jersey Away 2024 - Rp 450.000\n3. Syal Rajut Suporter - Rp 120.000\n4. Jaket Tracktop Maung - Rp 380.000"
-  },
-  {
-    id: 3,
-    name: "Internal_Guidelines.txt",
-    type: "TXT",
-    date: "Nov 02, 2023",
-    size: "128 KB",
-    status: "INDEXED",
-    content: "STANDAR PELAYANAN CHATBOT MAUNGBOT\n1. Selalu gunakan bahasa yang sopan, ramah, dan bernuansa kekeluargaan (menggunakan panggilan 'Bobotoh').\n2. Jangan memberikan informasi spekulatif tentang transfer pemain yang belum diumumkan secara resmi.\n3. Pertanyaan tiket yang bermasalah harus segera diarahkan ke menu eskalasi."
-  },
-  {
-    id: 4,
-    name: "Persib_History_and_Trophies.pdf",
-    type: "PDF",
-    date: "Nov 08, 2023",
-    size: "8.1 MB",
-    status: "INDEXED",
-    content: "SEJARAH PERSIB BANDUNG\nPersatuan Sepakbola Indonesia Bandung didirikan pada 14 Maret 1933. Persib merupakan salah satu klub pendiri PSSI. Gelar juara nasional diraih pada tahun 1937, 1961, 1986, 1990, 1994, 2014, dan juara terbaru Liga 1 Musim 2023/2024 di bawah asuhan Coach Bojan Hodak."
-  },
-  {
-    id: 5,
-    name: "Sponsor_Agreement_2024.pdf",
-    type: "PDF",
-    date: "Nov 15, 2023",
-    size: "1.2 MB",
-    status: "INDEXED",
-    content: "DOKUMEN KONTRAK & SPONSORSHIP 2024\nKerja sama eksklusif dengan brand apparel lokal terkemuka dan sponsor utama perbankan. Ketentuan logo sponsorship pada jersey utama: Logo utama di bagian dada tengah berukuran 20x10cm, logo sekunder di lengan kiri 8x8cm."
-  },
-  {
-    id: 6,
-    name: "Squad_List_Second_Half_2024.xlsx",
-    type: "XLSX",
-    date: "Nov 20, 2023",
-    size: "95 KB",
-    status: "INDEXED",
-    content: "DAFTAR SQUAD PERSIB LIGA 1 - PUTARAN KEDUA\n1. Kevin Ray Mendoza (GK) - 29 - Filipina\n2. Nick Kuipers (DF) - 2 - Belanda\n3. Gustavo Franca (DF) - 4 - Brasil\n4. Dedi Kusnandar (MF) - 11 - Indonesia\n5. Marc Klok (MF) - 23 - Indonesia (C)\n6. Ciro Alves (FW) - 77 - Brasil\n7. David da Silva (FW) - 19 - Brasil"
-  },
-  {
-    id: 7,
-    name: "Stadion_GBLA_Regulations.docx",
-    type: "DOCX",
-    date: "Nov 25, 2023",
-    size: "2.1 MB",
-    status: "INDEXED",
-    content: "ATURAN KESELAMATAN & AKSES STADION GELORA BANDUNG LAUTAN API (GBLA)\n1. Penonton wajib menukar e-ticket menjadi gelang fisik di lokasi penukaran resmi sebelum kick-off.\n2. Dilarang membawa senjata tajam, kembang api, suar (flare), botol kaca, dan laser pointer.\n3. Pintu gerbang stadion dibuka 3 jam sebelum pertandingan dimulai."
-  },
-  {
-    id: 8,
-    name: "Ticketing_System_Troubleshoot.txt",
-    type: "TXT",
-    date: "Dec 02, 2023",
-    size: "45 KB",
-    status: "INDEXED",
-    content: "PANDUAN SOLUSI PERMASALAHAN TIKET ONLINE\nGejala 1: Pembayaran berhasil tapi e-ticket tidak muncul di email.\nSolusi: Bobotoh disarankan cek folder Spam, atau login kembali ke aplikasi Persib App, lalu masuk ke menu 'Riwayat Transaksi'. Jika tetap kosong, arahkan ke eskalasi CS dengan melampirkan bukti transfer bank."
-  },
-  {
-    id: 9,
-    name: "Marketing_Campaign_L1.xlsx",
-    type: "XLSX",
-    date: "Dec 05, 2023",
-    size: "140 KB",
-    status: "INDEXED",
-    content: "RENCANA KAMPANYE PROMOSI LIGA 1\n1. Promo Tiket Keluarga (Beli 3 gratis 1 untuk tribun samping selatan)\n2. Merchandise Bundling (Jersey Matchday + Syal diskon 15%)\n3. Konten Live Instagram Matchday (Kuis tebak skor berhadiah merchandise bertanda tangan pemain)"
-  },
-  {
-    id: 10,
-    name: "Persib_Store_Operational_FAQ.docx",
-    type: "DOCX",
-    date: "Dec 10, 2023",
-    size: "3.2 MB",
-    status: "INDEXED",
-    content: "OPERASIONAL OUTLET PERSIB STORE\nAlamat: Jl. Sulanjana No. 17, Tamansari, Bandung.\nJam Buka: Senin - Minggu (10.00 - 21.00 WIB).\nKetentuan Retur: Penukaran barang cacat produksi maksimal 3 hari setelah pembelian dengan membawa struk fisik asli dan tag harga masih terpasang."
-  },
-  {
-    id: 11,
-    name: "Security_Briefing_Matchday.pdf",
-    type: "PDF",
-    date: "Dec 14, 2023",
-    size: "5.5 MB",
-    status: "INDEXED",
-    content: "SOP PENGAMANAN PERTANDINGAN KATEGORI A (HIGH RISK)\nJumlah personel keamanan gabungan (TNI, Polri, Steward) minimal 1.500 personel. Ring 3 berada di luar gerbang luar stadion, Ring 2 di gerbang masuk tribun, dan Ring 1 di area sentel ban dan lapangan."
-  },
-  {
-    id: 12,
-    name: "Media_Accreditation_Policy.docx",
-    type: "DOCX",
-    date: "Dec 20, 2023",
-    size: "1.7 MB",
-    status: "INDEXED",
-    content: "KEBIJAKAN AKREDITASI PERS & JURNALIS LIGA 1\nJurnalis peliput wajib memiliki kartu pers aktif dan terdaftar di sistem Liga Indonesia Baru (LIB). Pendaftaran ID Card pertandingan home Persib dilakukan secara online melalui Form Akreditasi H-3 sebelum kick-off."
-  }
-];
+import { docsAPI } from "../services/api";
 
 const ITEMS_PER_PAGE = 5;
 
 function KnowledgeBase() {
-  const [documents, setDocuments] = useState(INITIAL_DOCUMENTS);
+  const [documents, setDocuments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [isDragActive, setIsDragActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef(null);
+  const [customModal, setCustomModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info", // "confirm" | "success" | "error" | "info"
+    onConfirm: null,
+    onCancel: null
+  });
 
-  // Set up mock status change for demonstration
-  useEffect(() => {
-    const processingItems = documents.filter(doc => doc.status === "PROCESSING");
-    if (processingItems.length > 0) {
-      const timers = processingItems.map(item => {
-        return setTimeout(() => {
-          setDocuments(prevDocs => 
-            prevDocs.map(doc => 
-              doc.id === item.id ? { ...doc, status: "INDEXED" } : doc
-            )
-          );
-        }, 4000); // 4 seconds delay for realistic simulation
+  const showCustomAlert = (title, message, type = "info") => {
+    setCustomModal({
+      isOpen: true,
+      title: title,
+      message: message,
+      type: type,
+      onConfirm: () => {
+        setCustomModal(prev => ({ ...prev, isOpen: false }));
+      },
+      onCancel: null
+    });
+  };
+
+  const fetchDocuments = async () => {
+    setIsLoading(true);
+    try {
+      const data = await docsAPI.listDocs();
+      const mappedDocs = data.files.map((file, idx) => {
+        const ext = file.name.substring(file.name.lastIndexOf('.')).toUpperCase().replace('.', '');
+        const sizeStr = file.size_bytes > 1024 * 1024 
+          ? `${(file.size_bytes / (1024 * 1024)).toFixed(1)} MB` 
+          : `${(file.size_bytes / 1024).toFixed(0)} KB`;
+        
+        const dateStr = file.updated 
+          ? new Date(file.updated).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+          : '-';
+
+        return {
+          id: file.md5_hash || `${file.name}-${idx}`,
+          name: file.name,
+          type: ext,
+          date: dateStr,
+          size: sizeStr,
+          status: "INDEXED",
+          rawSize: file.size_bytes,
+        };
       });
-      return () => timers.forEach(clearTimeout);
+      setDocuments(mappedDocs);
+    } catch (error) {
+      console.error("Gagal memuat dokumen:", error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [documents]);
+  };
+
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
 
   // Handle Search Input Change
   const handleSearchChange = (e) => {
@@ -179,45 +109,61 @@ function KnowledgeBase() {
     }
   };
 
-  // Core file upload simulation
-  const handleFiles = (fileList) => {
-    const newDocs = Array.from(fileList).map((file, idx) => {
-      const ext = file.name.substring(file.name.lastIndexOf('.')).toUpperCase();
-      const name = file.name;
-      const sizeStr = file.size > 1024 * 1024 
-        ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` 
-        : `${(file.size / 1024).toFixed(0)} KB`;
-      
-      const today = new Date();
-      const options = { month: 'short', day: '2-digit', year: 'numeric' };
-      const formattedDate = today.toLocaleDateString('en-US', options);
-
-      return {
-        id: Date.now() + idx,
-        name: name,
-        type: ext.replace('.', ''),
-        date: formattedDate,
-        size: sizeStr,
-        status: "PROCESSING",
-        content: `Simulasi konten dokumen untuk file: ${name}.\nUkuran File: ${sizeStr}.\nDiunggah pada: ${formattedDate}.\nStatus saat ini sedang diekstrak dan di-embed ke dalam model Maung Bot.`
-      };
-    });
-
-    setDocuments(prevDocs => [...newDocs, ...prevDocs]);
-    setCurrentPage(1); // Go to page 1 to show the newly added file
-    alert(`${newDocs.length} file berhasil ditambahkan ke daftar antrean upload (Simulasi).`);
+  // Core file upload
+  const handleFiles = async (fileList) => {
+    setIsLoading(true);
+    let successCount = 0;
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i];
+      try {
+        await docsAPI.uploadDoc(file);
+        successCount++;
+      } catch (error) {
+        console.error(`Gagal upload file ${file.name}:`, error);
+        showCustomAlert("Gagal Upload", `Gagal mengunggah file ${file.name}: ${error.message || error}`, "error");
+      }
+    }
+    if (successCount > 0) {
+      showCustomAlert("Berhasil Upload", `${successCount} file berhasil diunggah dan di-embed ke sistem.`, "success");
+      fetchDocuments();
+    }
+    setIsLoading(false);
   };
 
   // Delete Action
-  const handleDelete = (id, name) => {
-    if (window.confirm(`Apakah Anda yakin ingin menghapus dokumen "${name}"? Tindakan ini juga akan menghapus seluruh data embedding terkait.`)) {
-      setDocuments(prevDocs => prevDocs.filter(doc => doc.id !== id));
-      // Adjust page if deletion emptied the current page
-      const remainingFiltered = filteredDocs.filter(doc => doc.id !== id);
-      const totalPagesRemaining = Math.ceil(remainingFiltered.length / ITEMS_PER_PAGE);
-      if (currentPage > totalPagesRemaining && totalPagesRemaining > 0) {
-        setCurrentPage(totalPagesRemaining);
+  const handleDelete = async (id, name) => {
+    setCustomModal({
+      isOpen: true,
+      title: "Hapus Dokumen?",
+      message: `Apakah Anda yakin ingin menghapus dokumen "${name}"? Tindakan ini juga akan menghapus seluruh data embedding terkait dan tidak dapat dibatalkan.`,
+      type: "confirm",
+      onConfirm: async () => {
+        setCustomModal(prev => ({ ...prev, isOpen: false }));
+        setIsLoading(true);
+        try {
+          await docsAPI.deleteDoc(name);
+          showCustomAlert("Berhasil Dihapus", `Dokumen "${name}" berhasil dihapus dari cloud storage dan database.`, "success");
+          fetchDocuments();
+        } catch (error) {
+          console.error(`Gagal menghapus dokumen ${name}:`, error);
+          showCustomAlert("Gagal Menghapus", `Gagal menghapus dokumen: ${error.message || error}`, "error");
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      onCancel: () => {
+        setCustomModal(prev => ({ ...prev, isOpen: false }));
       }
+    });
+  };
+
+  // Download Action
+  const handleDownload = async (name) => {
+    try {
+      await docsAPI.downloadDoc(name);
+    } catch (error) {
+      console.error(`Gagal mendownload dokumen ${name}:`, error);
+      showCustomAlert("Gagal Download", `Gagal mengunduh dokumen: ${error.message || error}`, "error");
     }
   };
 
@@ -425,6 +371,18 @@ function KnowledgeBase() {
                               </svg>
                             </button>
                             <button 
+                              className="kb-action-btn download" 
+                              title="Download Dokumen"
+                              style={{ color: "#3b82f6" }}
+                              onClick={() => handleDownload(doc.name)}
+                            >
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                              </svg>
+                            </button>
+                            <button 
                               className="kb-action-btn delete" 
                               title="Hapus Dokumen"
                               onClick={() => handleDelete(doc.id, doc.name)}
@@ -540,15 +498,104 @@ function KnowledgeBase() {
 
                 {/* Document Content Snippet */}
                 <div className="kb-doc-content-section">
-                  <span className="kb-doc-content-title">Ekstrak Konten Teks</span>
-                  <pre className="kb-doc-content-box">{selectedDoc.content}</pre>
+                  <span className="kb-doc-content-title">Status Indeksasi</span>
+                  <pre className="kb-doc-content-box" style={{ fontFamily: "inherit" }}>
+                    File ini telah diunggah dan terindeks dengan aman di cloud storage. 
+                    Anda dapat mengunduh file asli menggunakan tombol "Download" di bawah ini.
+                  </pre>
                 </div>
               </div>
               
               <div className="kb-modal-footer">
+                <button type="button" className="kb-btn-primary" onClick={() => handleDownload(selectedDoc.name)} style={{ marginRight: "10px", backgroundColor: "#3b82f6", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "4px", cursor: "pointer" }}>
+                  📥 Download Dokumen
+                </button>
                 <button type="button" className="kb-btn-secondary" onClick={closeModal}>
                   Tutup
                 </button>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* Custom Confirmation / Alert Modal */}
+        {customModal.isOpen && (
+          <div className="kb-modal-overlay" onClick={() => {
+            if (customModal.type !== 'confirm' && customModal.onConfirm) {
+              customModal.onConfirm();
+            }
+          }}>
+            <div className="kb-modal-content custom-dialog" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "450px" }}>
+              
+              <div className="kb-modal-header" style={{ borderBottom: "none", paddingBottom: "10px" }}>
+                <h3 className="kb-modal-title" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  {customModal.type === 'confirm' && <span style={{ color: '#ef4444', fontSize: '22px' }}>⚠️</span>}
+                  {customModal.type === 'success' && <span style={{ color: '#10b981', fontSize: '22px' }}>✅</span>}
+                  {customModal.type === 'error' && <span style={{ color: '#ef4444', fontSize: '22px' }}>❌</span>}
+                  {customModal.type === 'info' && <span style={{ color: '#3b82f6', fontSize: '22px' }}>ℹ️</span>}
+                  {customModal.title}
+                </h3>
+              </div>
+
+              <div className="kb-modal-body" style={{ paddingTop: "10px", paddingBottom: "24px" }}>
+                <p style={{ margin: 0, color: "#94a3b8", fontSize: "14px", lineHeight: "1.6" }}>
+                  {customModal.message}
+                </p>
+              </div>
+
+              <div className="kb-modal-footer" style={{ borderTop: "1px solid #1e293b", padding: "16px 24px" }}>
+                {customModal.type === 'confirm' ? (
+                  <>
+                    <button 
+                      type="button" 
+                      className="kb-btn-secondary" 
+                      onClick={customModal.onCancel}
+                      style={{ padding: "8px 16px", borderRadius: "6px" }}
+                    >
+                      Batal
+                    </button>
+                    <button 
+                      type="button" 
+                      className="kb-btn-primary" 
+                      onClick={customModal.onConfirm}
+                      style={{ 
+                        backgroundColor: "#ef4444", 
+                        color: "#fff", 
+                        border: "none", 
+                        padding: "8px 16px", 
+                        borderRadius: "6px", 
+                        cursor: "pointer", 
+                        fontWeight: "500",
+                        transition: "background 0.2s" 
+                      }}
+                      onMouseOver={(e) => e.target.style.backgroundColor = "#dc2626"}
+                      onMouseOut={(e) => e.target.style.backgroundColor = "#ef4444"}
+                    >
+                      Ya, Hapus
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    type="button" 
+                    className="kb-btn-primary" 
+                    onClick={customModal.onConfirm}
+                    style={{ 
+                      backgroundColor: "#3b82f6", 
+                      color: "#fff", 
+                      border: "none", 
+                      padding: "8px 16px", 
+                      borderRadius: "6px", 
+                      cursor: "pointer", 
+                      fontWeight: "500",
+                      transition: "background 0.2s"
+                    }}
+                    onMouseOver={(e) => e.target.style.backgroundColor = "#2563eb"}
+                    onMouseOut={(e) => e.target.style.backgroundColor = "#3b82f6"}
+                  >
+                    OK
+                  </button>
+                )}
               </div>
 
             </div>
