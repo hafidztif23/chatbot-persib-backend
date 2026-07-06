@@ -213,54 +213,65 @@ ul { list-style: none; padding: 0; margin: 0; }
   transition: all 0.3s ease-in-out;
 }
 /* ==========================================================================
-   6. HERO SECTION
+   6. HERO SECTION (Tanpa Background Gambar)
    ========================================================================== */
 .hero-section {
+  /* Ini adalah warna biru dongker gelap yang menyerupai gambarmu */
+  background-color: #040b1e; 
+  min-height: 80vh; 
   display: flex;
   align-items: center;
-  padding: 70px 5%;
-  gap: 60px;
+  padding: 80px 5%;
 }
 
 .hero-container {
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
-  padding: 10px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 60px;
+  justify-content: flex-start;
 }
 
 .hero-content {
-  flex: 1;
+  max-width: 900px; 
   text-align: left;
 }
 
 .hero-title {
-  font-size: 3rem;
-  line-height: 1.2;
-  margin-bottom: 20px;
-  color: #fff;
+  font-size: 3.2rem;
+  font-weight: 800; 
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: #ffffff;
+  letter-spacing: -1px; 
 }
 
 .hero-description {
-  font-size: 1.1rem;
-  color: #ccc;
-  margin-bottom: 30px;
+  font-size: 1.15rem;
+  color: #b0b8c4; 
   line-height: 1.6;
+  margin: 0;
 }
 
-.hero-buttons {
-  display: flex;
-  gap: 15px;
-  justify-content: flex-start;
-}
+/* Responsif untuk Layar HP */
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 60vh;
+    padding: 100px 24px 60px 24px;
+  }
+  
+  .hero-content {
+    max-width: 100%; 
+  }
 
-.hero-mockup {
-  flex: 1;
-  display: flex;
-  justify-content: center;
+  .hero-title {
+    font-size: 2.2rem;
+    line-height: 1.2;
+  }
+  
+  .hero-description {
+    font-size: 1rem;
+  }
 }
 /* ==========================================================================
    7. CHAT WINDOW MOCKUP
@@ -760,161 +771,113 @@ ul { list-style: none; padding: 0; margin: 0; }
   text-align: left;
 }
 /* ==========================================================================
-   13. CTA SECTION
-   ========================================================================== */
-.cta-section { 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  padding: 80px 0;
-  width: 100%; 
-}
-
-.cta-card {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
-  border: 1px solid rgba(251, 191, 36, 0.2);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 16px; 
-  padding: 60px 40px;
-  text-align: center;
-  width: 100%;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-}
-
-.cta-title { 
-  font-size: 2.4rem; 
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1.3;
-  margin-bottom: 20px; 
-}
-
-.cta-description { 
-  font-size: 1rem; 
-  color: var(--text-muted, #94a3b8); 
-  line-height: 1.6;
-  max-width: 680px;
-  margin: 0 auto 32px auto; 
-}
-
-.cta-card .cta-btn {
-  background: #7c3aed;
-  color: #ffffff;
-  padding: 14px 36px;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 25px rgba(124, 58, 237, 0.5); 
-}
-
-.cta-card .cta-btn:hover {
-  background: #6d28d9;
-  box-shadow: 0 4px 35px rgba(124, 58, 237, 0.7);
-  transform: translateY(-2px);
-}
-
-.cta-card .cta-btn:active {
-  transform: translateY(0);
-} 
-/* ==========================================================================
-   14. FOOTER
+   13. FOOTER (Sesuai Gambar)
    ========================================================================== */
 .footer {
-  background-color: #050811;
-  padding: 60px 5% 20px;
-  border-top: 1px solid var(--border-color);
+  background-color: #171b87; /* Sesuaikan warna biru gelap Persib */
+  padding: 40px 0 80px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
 }
 
-.footer-content { 
-  display: flex; 
-  justify-content: space-between; 
-  margin: 0 auto 60px; 
-  max-width: 1440px; 
-  gap: 40px;
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px; /* Jarak antar blok dan garis pemisah */
+  max-width: 1200px;
+  width: 100%;
+  padding: 0 20px;
 }
 
-.footer-logo {
-  display: flex; 
-  align-items: center; 
-  gap: 12px;
-  font-size: 18px; 
-  font-weight: 700; 
-  margin-bottom: 16px;
+/* Pengaturan tiap kolom */
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 30px 0 30px;
 }
 
-.footer-logo-img { 
-  width: 36px; 
-  height: 36px; 
-  object-fit: contain; 
+.logo-col {
+  align-items: center;
+
 }
 
-.social-text { 
-  color: var(--text-muted); 
-  font-size: 0.85rem; 
-  margin-bottom: 16px; 
-  max-width: 300px; 
-  line-height: 1.5;
+/* Ukuran Logo Persib */
+.footer-logo-img {
+  height: 85px; 
+  object-fit: contain;
+  filter: brightness(0) invert(1);
 }
 
-.social-icons { 
-  display: flex; 
-  gap: 16px; 
-  margin-top: 12px; 
+/* Garis Putih Vertikal */
+.vertical-divider {
+  width: 1px;
+  height: 80px;
+  background-color: #ffffff;
+  opacity: 1; /* Dibuat sedikit transparan agar tidak terlalu mencolok */
+}
+
+/* Teks Judul (EMAIL, MEDIA SOSIAL, UNDUH APLIKASI) */
+.col-title {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+/* Teks info@persib.co.id */
+.email-link {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.email-link:hover {
+  opacity: 0.8;
+}
+
+/* Deretan Icon Sosmed */
+.social-icons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
 }
 
 .social-icon {
-  width: 20px; 
-  height: 20px; 
-  object-fit: contain; 
-  cursor: pointer; 
-  transition: 0.2s ease;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+  filter: brightness(0) invert(1);
 }
 
-.social-icon:hover { 
-  transform: translateY(-2px); 
+.social-icon:hover {
+  transform: translateY(-2px);
 }
 
-.footer-links-grid { 
-  display: flex; 
-  gap: 80px; 
-  flex-wrap: wrap;
+/* Gambar App Store & Google Play */
+.app-badges {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
-.footer-column h4 { 
-  margin-bottom: 20px; 
-  font-size: 1rem; 
-  color: var(--text-main); 
+.app-badge {
+  height: 38px;
+  object-fit: contain;
+  transition: opacity 0.2s ease;
+  filter: brightness(0) invert(1);
 }
 
-.footer-column a { 
-  display: block; 
-  color: var(--text-muted); 
-  margin-bottom: 12px; 
-  font-size: 0.85rem; 
-  transition: color 0.2s;
+.app-badge:hover {
+  opacity: 0.8;
 }
 
-.footer-column a:hover { 
-  color: var(--accent-gold); 
-}
-
-.footer-bottom {
-  max-width: 1440px; 
-  margin: 0 auto;
-  border-top: 1px solid var(--border-color);
-  padding-top: 20px; 
-  display: flex; 
-  justify-content: space-between;
-  color: var(--text-muted); 
-  font-size: 0.8rem; 
-  align-items: center; 
-  flex-wrap: wrap; 
-  gap: 16px;
-}
 /* ==========================================================================
       RESPONSIVE
    ========================================================================== */
@@ -948,12 +911,20 @@ ul { list-style: none; padding: 0; margin: 0; }
   }
 
   .footer-content {
-    flex-direction: column;
+    gap: 15px; /* Jarak antar blok dirapatkan agar tidak tumpah */
+    padding: 0 10px;
   }
 
-  .footer-links-grid {
-    gap: 40px;
-    justify-content: space-between;
+  .footer-logo-img {
+    height: 70px; /* Logo sedikit diperkecil */
+  }
+
+  .email-link {
+    font-size: 16px; /* Teks email disesuaikan agar muat */
+  }
+
+  .app-badge {
+    height: 32px; /* Tombol aplikasi sedikit diperkecil */
   }
 }
 
@@ -1088,56 +1059,6 @@ ul { list-style: none; padding: 0; margin: 0; }
     font-size: 0.75rem;
   }
 
-  .footer {
-    padding: 40px 5% 24px; 
-  }
-
-  .footer-content {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 40px; 
-  }
-
-  .footer-logo {
-    justify-content: flex-start;
-  }
-
-  .social-text {
-    text-align: left; 
-    margin-bottom: 20px;
-    max-width: 100%;
-  }
-
-  .social-icons {
-    justify-content: flex-start;
-  }
-
-  .footer-links-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); 
-    gap: 32px 24px;
-    width: 100%;
-  }
-
-  .footer-column {
-    text-align: left; 
-    width: 100%;
-  }
-
-  .footer-column h4 {
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .footer-bottom {
-    flex-direction: column;
-    align-items: flex-start; 
-    text-align: left;
-    gap: 12px;
-    padding-top: 24px;
-  }
-
   .hero-container {
     flex-direction: column;
     padding: 10px 5%;
@@ -1202,6 +1123,48 @@ ul { list-style: none; padding: 0; margin: 0; }
     opacity: 0; 
     transform: translateX(0) scale(0.5); 
   }
+
+.footer {
+    padding: 40px 24px; /* Memberi jarak aman di kiri dan kanan layar */
+    justify-content: flex-start; 
+  }
+
+  .footer-content {
+    flex-direction: column; /* Menyusun elemen ke bawah */
+    align-items: flex-start; /* Memaksa semua elemen rata kiri */
+    gap: 32px; /* Jarak antar blok (Logo, Email, dll) */
+  }
+
+  /* Hilangkan garis pemisah di versi mobile */
+  .vertical-divider {
+    display: none; 
+  }
+
+  /* Pastikan isi di dalam tiap blok juga rata kiri */
+  .footer-col {
+    align-items: flex-start;
+  }
+
+  /* Susunan icon medsos */
+  .social-icons {
+    justify-content: flex-start;
+    gap: 20px;
+  }
+
+  /* Pastikan tombol aplikasi tetap berjejer ke samping */
+  .app-badges {
+    flex-direction: row; 
+    gap: 12px;
+  }
+
+  .app-badge {
+    height: 38px; /* Sesuaikan ukuran tombol agar tidak kebesaran di HP */
+  }
+  
+  /* Ukuran logo untuk mobile */
+  .footer-logo-img {
+    height: 70px; 
+  }
 }
 
 @media (max-width: 480px) {
@@ -1215,8 +1178,33 @@ ul { list-style: none; padding: 0; margin: 0; }
     box-sizing: border-box;
   }
 
-  .footer-links-grid {
-    grid-template-columns: 1fr; 
-    gap: 28px;
+  .footer {
+    padding: 30px 0;
+  }
+
+  .footer-logo-img {
+    height: 60px; /* Logo lebih kecil lagi untuk layar HP */
+  }
+
+  .col-title {
+    font-size: 12px; /* Teks judul kolom dikecilkan */
+  }
+
+  .email-link {
+    font-size: 18px; 
+  }
+
+  .vertical-divider {
+    width: 80%; /* Garis pemisah dilebarkan agar lebih proporsional di HP */
+  }
+
+  /* Susun tombol aplikasi menjadi atas-bawah agar tidak terlalu sempit */
+  .app-badges {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .app-badge {
+    height: 40px; /* Ukuran tombol dibesarkan sedikit agar mudah ditekan jari */
   }
 }

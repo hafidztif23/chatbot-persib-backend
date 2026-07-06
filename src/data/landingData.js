@@ -3,10 +3,11 @@ import membershipImg from "../image/membership.jpg";
 import scheduleImg from "../image/schedule.jpg";
 import merchImg from "../image/merch.png";
 import stadiumImg from "../image/stadium.jpg";
-import instagramIcon from "../image/instagram2.jpg";
-import linkedinIcon from "../image/linkedin.png";
-import youtubeIcon from "../image/youtube2.jpg";
-import twitterIcon from "../image/X2.jpg";
+import instagramIcon from "../image/instagram3.png";
+import linkedinIcon from "../image/linkedin3.png";
+import youtubeIcon from "../image/youtube2.png";
+import twitterIcon from "../image/X2.png";
+import facebookIcon from "../image/facebook2.png";
 
 export const landingData = {
   navLinks: [
@@ -64,8 +65,9 @@ export const landingData = {
     },
   ],
   footerSocials: [
-    { href: "https://x.com/persib", icon: twitterIcon, label: "X / Twitter" },
+    { href: "https://www.facebook.com/PERSIB", icon: facebookIcon, label: "Facebook" },
     { href: "https://www.instagram.com/persib/?hl=id", icon: instagramIcon, label: "Instagram" },
+    { href: "https://x.com/persib", icon: twitterIcon, label: "X / Twitter" },
     { href: "https://id.linkedin.com/company/persib", icon: linkedinIcon, label: "LinkedIn" },
     { href: "https://www.youtube.com/channel/UCq9VjkTSRBvlyr0sSXwm8Kw", icon: youtubeIcon, label: "YouTube" },
   ],

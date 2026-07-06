@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
 import Button from '../common/Button';
 import { landingData } from '../../data/landingData';
-import logoPersib from '../../image/persib-logo.png';
+import logoPersib from '../../image/persib-logo2.png';
 import '../../styles/landing.css';
 
 const Navbar = () => {
@@ -18,7 +18,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-        <img src={logoPersib} alt="Persib Logo" style={{ width: '32px', height: '32px' }} />
+        <img src={logoPersib} className="nav-logo-img" alt="Persib Logo" style={{ width: '32px', height: '32px' }} />
         MAUNG BOT
       </div>
       
