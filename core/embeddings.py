@@ -113,11 +113,13 @@ def load_file_from_bytes(file_name: str, data: bytes) -> str:
 # ──────────────────────────────────────────────
 
 def chunk_text(content: str, chunk_size: int = 600, overlap: int = 75) -> list[str]:
-    chunks, start = [], 0
-    while start < len(content):
-        chunks.append(content[start:start + chunk_size])
-        start += chunk_size - overlap
-    return chunks
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=overlap,
+        separators=["\n\n", "\n", ". ", " ", ""],
+    )
+    return splitter.split_text(content)
 
 
 def embed_text(text: str) -> list:
