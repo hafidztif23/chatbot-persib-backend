@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { tokenManager } from "../../services/api";
 import { useAuth } from "../../hooks/useAuth";
+import { getTranslation } from "../../utils/translation";
 import "../Chatbot.css";
 
 function Sidebar({ isOpen, setIsOpen }) {
-  const { logout } = useAuth();
-  const [user, setUser] = useState(tokenManager.getUser());
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
 
   const isAdmin = user?.role === 'admin' || user?.email?.endsWith('@persib.co.id') || user?.email?.includes('admin');
+
+  // Ambil kamus terjemahan berdasarkan preferensi user
+  const t = getTranslation(user?.referensi_bahasa);
 
   const handleLogout = () => {
     logout();
@@ -36,37 +38,37 @@ function Sidebar({ isOpen, setIsOpen }) {
           navigate("/chat");
           setIsOpen(false);
         }}>
-          <span>➕ Obrolan Baru</span>
+          <span>➕ {t.new_chat}</span>
         </button>
       )}
 
       <div className="cb-sidebar-menu">
-        <h4>MENU UTAMA</h4>
+        <h4>{t.menu_utama}</h4>
         {!isAdmin && (
           <Link to="/chat" className={`cb-menu-item ${currentPath === '/chat' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
-            💬 Chat Sekarang
+            💬 {t.chat_sekarang}
           </Link>
         )}
         {isAdmin && (
           <Link to="/knowledge-base" className={`cb-menu-item ${currentPath === '/knowledge-base' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
-            💬 Knowledge Base
+            💬 {t.knowledge_base}
           </Link>
         )}
       </div>
 
       <div className="cb-sidebar-footer">
-        <h4>USER</h4>
+        <h4>{t.user_menu}</h4>
         <Link to="/profile" className={`cb-menu-item ${currentPath === '/profile' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
-          👤 Edit Profil
+          👤 {t.edit_profil}
         </Link>
         
-        <h4>PENGATURAN</h4>
+        <h4>{t.pengaturan_menu}</h4>
         <Link to="/settings" className={`cb-settings-item ${currentPath === '/settings' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
-          <span>⚙️ Settings</span>
+          <span>⚙️ {t.settings}</span>
         </Link>
       </div>
 
-      <button className="cb-logout-btn" onClick={handleLogout}>Keluar</button>
+      <button className="cb-logout-btn" onClick={handleLogout}>{t.logout}</button>
     </aside>
   );
 }

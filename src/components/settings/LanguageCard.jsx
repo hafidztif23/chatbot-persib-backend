@@ -1,5 +1,7 @@
 import Card from "../common/Card";
 import CustomSelect from "../common/CustomSelect";
+import { useAuth } from "../../hooks/useAuth";
+import { getTranslation } from "../../utils/translation";
 
 const LANGUAGE_OPTIONS = ["English", "Indonesia"];
 
@@ -9,10 +11,13 @@ function LanguageCard({
   generationLanguage,
   setGenerationLanguage,
 }) {
+  const { user } = useAuth();
+  const t = getTranslation(user?.referensi_bahasa);
+
   return (
-    <Card title="Language">
+    <Card title={t.card_language}>
       <div className="settings-row">
-        <span>System Language</span>
+        <span>{t.system_lang}</span>
         <CustomSelect
           value={systemLanguage}
           options={LANGUAGE_OPTIONS}
@@ -21,7 +26,7 @@ function LanguageCard({
       </div>
 
       <div className="settings-row">
-        <span>Generation Language</span>
+        <span>{t.gen_lang}</span>
         <CustomSelect
           value={generationLanguage}
           options={LANGUAGE_OPTIONS}

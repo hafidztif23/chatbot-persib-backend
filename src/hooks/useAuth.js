@@ -1,17 +1,24 @@
-import { useState } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import { authAPI, tokenManager } from '../services/api'
 
-export const useAuth = () => {
-  const [user, setUser] = useState(tokenManager.getUser())
+const AuthContext = createContext(null)
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUserState] = useState(tokenManager.getUser())
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+
+  const updateUser = (newUser) => {
+    tokenManager.setUser(newUser)
+    setUserState(newUser)
+  }
 
   const login = async (email, password) => {
     setIsLoading(true)
     setError(null)
     try {
       const response = await authAPI.login(email, password)
-      setUser(response.account)
+      setUserState(response.account)
       return response
     } catch (err) {
       setError(err.message)
@@ -36,7 +43,7 @@ export const useAuth = () => {
   }
 
   const logout = () => {
-    setUser(null)
+    setUserState(null)
     authAPI.logout()
   }
 
@@ -44,13 +51,17 @@ export const useAuth = () => {
     return tokenManager.isLoggedIn()
   }
 
-  return {
-    user,
-    isLoading,
-    error,
-    login,
-    register,
-    logout,
-    isLoggedIn,
+  return React.createElement(
+    AuthContext.Provider,
+    { value: { user, isLoading, error, login, register, logout, isLoggedIn, updateUser } },
+    children
+  )
+}
+
+export const useAuth = () => {
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
   }
+  return context
 }

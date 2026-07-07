@@ -4,10 +4,11 @@ import './Chatbot.css'
 import PersibLogo from '../image/Logo_Persib_Bandung.png'
 import { chatAPI, tokenManager } from '../services/api'
 import { useAuth } from '../hooks/useAuth'
+import { getTranslation } from '../utils/translation'
 
 function Chatbot() {
-  const { logout } = useAuth()
-  const [user, setUser] = useState(tokenManager.getUser())
+  const { logout, user } = useAuth()
+  const t = getTranslation(user?.referensi_bahasa)
   const [isNewChat, setIsNewChat] = useState(true)
   const [inputMessage, setInputMessage] = useState('')
   const [messages, setMessages] = useState([])
@@ -16,10 +17,10 @@ function Chatbot() {
   const messagesEndRef = useRef(null)
 
   const suggestedQuestions = [
-    'Siapa top skorer Persib musim ini?',
-    'Analisis formasi 3-4-3 Coach Bojan',
-    'Kapan jadwal Persib vs Persija?',
-    'Tips bertahan ala Robby Darwin'
+    t.suggested_q1,
+    t.suggested_q2,
+    t.suggested_q3,
+    t.suggested_q4
   ]
 
   const scrollToBottom = () => {
@@ -191,8 +192,11 @@ function Chatbot() {
             <div className="cb-logo-container">
               <img src={PersibLogo} alt="Persib Logo" className="cb-persib-logo" />
             </div>
-            <h1 className="cb-welcome-title">Mulai obrolan baru dengan <span className="cb-highlight">Maung Chat</span></h1>
-            <p className="cb-welcome-subtitle">Tanya seputar taktik, jadwal pertandingan, info pemain, atau ngobrol seru bareng AI Legenda Persib.</p>
+            <h1 className="cb-welcome-title">
+              {user?.referensi_bahasa === 2 ? "Start a new chat with " : "Mulai obrolan baru dengan "}
+              <span className="cb-highlight">Maung Chat</span>
+            </h1>
+            <p className="cb-welcome-subtitle">{t.chatbot_subtitle}</p>
 
             <div className="cb-suggested-questions">
               {suggestedQuestions.map((question, index) => (
@@ -257,7 +261,7 @@ function Chatbot() {
             <input
               type="text"
               className="cb-chat-input"
-              placeholder="Ajukan Pertanyaan atau Mulai Obrolan..."
+              placeholder={t.chatbot_placeholder}
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               disabled={isLoading}

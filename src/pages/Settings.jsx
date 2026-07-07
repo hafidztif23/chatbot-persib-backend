@@ -1,50 +1,80 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import NotificationCard from "../components/settings/NotificationCard";
 import LanguageCard from "../components/settings/LanguageCard";
 import ToneCard from "../components/settings/ToneCard";
 import Button from "../components/common/Button";
+import { useAuth } from "../hooks/useAuth";
+import { authAPI } from "../services/api";
+import { getTranslation } from "../utils/translation";
 import "../styles/settings.css";
 
-const KEYS = {
-  NOTIFICATIONS: "settings_notifications",
-  SYSTEM_LANG: "settings_systemLanguage",
-  GEN_LANG: "settings_generationLanguage",
-  TONE: "settings_tone",
-  FORMALITY: "settings_formalityLevel",
-};
-
 function Settings() {
+  const { user, updateUser } = useAuth();
+  const t = getTranslation(user?.referensi_bahasa);
+
   const [notifications, setNotifications] = useState(() => 
-    JSON.parse(localStorage.getItem(KEYS.NOTIFICATIONS)) ?? true
+    JSON.parse(localStorage.getItem("settings_notifications")) ?? true
   );
-  const [systemLanguage, setSystemLanguage] = useState(() => 
-    localStorage.getItem(KEYS.SYSTEM_LANG) ?? "English"
+  
+  // Baca pengaturan dari user profil database (default: 1 -> Indonesia, 2 -> English)
+  const [systemLanguage, setSystemLanguage] = useState(
+    user?.referensi_bahasa === 2 ? "English" : "Indonesia"
   );
-  const [generationLanguage, setGenerationLanguage] = useState(() => 
-    localStorage.getItem(KEYS.GEN_LANG) ?? "English"
+  const [generationLanguage, setGenerationLanguage] = useState(
+    user?.referensi_generate === 2 ? "English" : "Indonesia"
   );
+
   const [tone, setTone] = useState(() => 
-    localStorage.getItem(KEYS.TONE) ?? "Formal"
+    localStorage.getItem("settings_tone") ?? "Formal"
   );
   const [formalityLevel, setFormalityLevel] = useState(() => 
-    localStorage.getItem(KEYS.FORMALITY) ?? "Casual"
+    localStorage.getItem("settings_formalityLevel") ?? "Casual"
   );
 
-  const handleSave = () => {
-    localStorage.setItem(KEYS.NOTIFICATIONS, JSON.stringify(notifications));
-    localStorage.setItem(KEYS.SYSTEM_LANG, systemLanguage);
-    localStorage.setItem(KEYS.GEN_LANG, generationLanguage);
-    localStorage.setItem(KEYS.TONE, tone);
-    localStorage.setItem(KEYS.FORMALITY, formalityLevel);
-    
-    alert("Pengaturan berhasil disimpan!");
+  // Update local states jika data user berubah (misal baru login atau data sync)
+  useEffect(() => {
+    if (user) {
+      setSystemLanguage(user.referensi_bahasa === 2 ? "English" : "Indonesia");
+      setGenerationLanguage(user.referensi_generate === 2 ? "English" : "Indonesia");
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    try {
+      const ref_bahasa = systemLanguage === "English" ? 2 : 1;
+      const ref_generate = generationLanguage === "English" ? 2 : 1;
+
+      // 1. Simpan ke database backend
+      await authAPI.updateProfile({
+        referensi_bahasa: ref_bahasa,
+        referensi_generate: ref_generate,
+      });
+
+      // 2. Sinkronisasi global auth state agar langsung me-render ulang seluruh halaman/Sidebar
+      const updatedUser = {
+        ...user,
+        referensi_bahasa: ref_bahasa,
+        referensi_generate: ref_generate,
+      };
+      updateUser(updatedUser);
+
+      // 3. Simpan setting dummy lokal lainnya
+      localStorage.setItem("settings_notifications", JSON.stringify(notifications));
+      localStorage.setItem("settings_tone", tone);
+      localStorage.setItem("settings_formalityLevel", formalityLevel);
+
+      alert(t.save_success || "Pengaturan berhasil disimpan!");
+    } catch (error) {
+      console.error("Gagal menyimpan pengaturan:", error);
+      alert("Gagal menyimpan pengaturan: " + (error.message || error));
+    }
   };
 
   return (
     <DashboardLayout>
       <div className="settings-page">
-        <h1 className="settings-title">Settings</h1>
+        <h1 className="settings-title">{t.settings_title}</h1>
         
         <div className="settings-grid">
           <NotificationCard 
@@ -67,7 +97,7 @@ function Settings() {
 
         <div className="settings-actions">
           <Button className="profile-update-btn" onClick={handleSave}>
-            Update →
+            {t.update_btn}
           </Button>
         </div>
       </div>
