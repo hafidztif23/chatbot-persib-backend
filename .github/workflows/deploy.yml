@@ -56,7 +56,7 @@ jobs:
             --min-instances=0 \
             --max-instances=10 \
             --service-account=$(gcloud projects describe ${{ env.PROJECT_ID }} --format='value(projectNumber)')-compute@developer.gserviceaccount.com \
-            --set-secrets=INSTANCE_CONNECTION_NAME=INSTANCE_CONNECTION_NAME:latest,DB_PASSWORD=DB_PASSWORD:latest,DB_USER=DB_USER:latest,DB_NAME=DB_NAME:latest,HUGGINGFACEHUB_API_TOKEN=HUGGINGFACEHUB_API_TOKEN:latest,JWT_SECRET_KEY=JWT_SECRET_KEY:latest,API_BASE_URL=API_BASE_URL:latest \
+            --set-secrets=INSTANCE_CONNECTION_NAME=INSTANCE_CONNECTION_NAME:latest,DB_PASSWORD=DB_PASSWORD:latest,DB_USER=DB_USER:latest,DB_NAME=DB_NAME:latest,HUGGINGFACEHUB_API_TOKEN_1=HUGGINGFACEHUB_API_TOKEN_1:latest,HUGGINGFACEHUB_API_TOKEN_2=HUGGINGFACEHUB_API_TOKEN_2:latest,HUGGINGFACEHUB_API_TOKEN_3=HUGGINGFACEHUB_API_TOKEN_3:latest,JWT_SECRET_KEY=JWT_SECRET_KEY:latest,API_BASE_URL=API_BASE_URL:latest \
             --set-env-vars=CHATBOT_NAME=MaungBot,GCS_BUCKET_NAME=maungbot-docs \
             --project=${{ env.PROJECT_ID }}
 
