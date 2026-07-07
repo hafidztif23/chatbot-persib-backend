@@ -61,6 +61,8 @@ class UpdateProfileRequest(BaseModel):
     nomor_telepon: Optional[str]  = None
     tanggal_lahir: Optional[date] = None
     kota:          Optional[str]  = None
+    referensi_bahasa: Optional[int] = None
+    referensi_generate: Optional[int] = None
 
     @field_validator("nomor_telepon")
     @classmethod
@@ -87,6 +89,8 @@ def _format_account(row: dict) -> dict:
         "membership":    row["membership"],
         "role":          row.get("role"),
         "created_at":    str(row["created_at"]) if row.get("created_at") else None,
+        "referensi_bahasa": row.get("referensi_bahasa", 1),
+        "referensi_generate": row.get("referensi_generate", 1),
     }
 
 # REGISTER
@@ -195,6 +199,8 @@ def update_profile(
     if data.nomor_telepon is not None: fields["nomor_telepon"] = data.nomor_telepon
     if data.tanggal_lahir is not None: fields["tanggal_lahir"] = data.tanggal_lahir
     if data.kota          is not None: fields["kota"]          = data.kota
+    if data.referensi_bahasa   is not None: fields["referensi_bahasa"]   = data.referensi_bahasa
+    if data.referensi_generate is not None: fields["referensi_generate"] = data.referensi_generate
 
     if not fields:
         raise HTTPException(

@@ -43,7 +43,8 @@ def get_current_account(
         row = conn.execute(
             text("""
                 SELECT id_account, nama_lengkap, nik, email, nomor_telepon,
-                       tanggal_lahir, jenis_kelamin, kota, membership, role, created_at
+                       tanggal_lahir, jenis_kelamin, kota, membership, role, created_at,
+                       referensi_bahasa, referensi_generate
                 FROM accounts
                 WHERE id_account = :id_account
             """),

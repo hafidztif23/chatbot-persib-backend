@@ -26,11 +26,11 @@ if INSTANCE_CONNECTION_NAME and DB_PASSWORD:
         )
 
     engine = create_engine("postgresql+pg8000://", creator=getconn)
-    print("✓ Connected to Cloud SQL via Python Connector")
+    print("Connected to Cloud SQL via Python Connector")
 
 elif DATABASE_URL:
     engine = create_engine(DATABASE_URL)
-    print("✓ Connected via DATABASE_URL")
+    print("Connected via DATABASE_URL")
 
 else:
     # Fallback lokal: SQLite
