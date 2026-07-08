@@ -33,10 +33,10 @@ def get_pemain_by_status(status: str):
     response = httpx.get(f"{API_BASE_URL}/pemain", params={"status": status})
     return response.json().get("pemain", [])
 
-def semantic_search_api(query: str, top_k: int = 5):
+def semantic_search_api(query: str, top_k: int = 5, min_similarity: float = 0.70):
     response = httpx.post(
         f"{API_BASE_URL}/search/semantic",
-        json={"query": query, "top_k": top_k}
+        json={"query": query, "top_k": top_k, "min_similarity": min_similarity}
     )
     return response.json().get("results", [])
 

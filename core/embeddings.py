@@ -19,7 +19,7 @@ FILE_CHUNK_CONFIG = {
 }
 
 DEFAULT_CHUNK_CONFIG = {"chunk_size": 600, "overlap": 75}
-
+SIMILARITY_THRESHOLD = 0.40
 
 # ──────────────────────────────────────────────
 # HASH / TRACKER
@@ -188,10 +188,10 @@ def store_embeddings_from_docs(force: bool = False):
 
 
 # ──────────────────────────────────────────────
-# SEMANTIC SEARCH (tidak berubah)
+# SEMANTIC SEARCH
 # ──────────────────────────────────────────────
 
-def semantic_search(query: str, top_k: int = 5) -> list:
+def semantic_search(query: str, top_k: int = 5, min_similarity: float = SIMILARITY_THRESHOLD) -> list:
     query_embedding = embed_text(query)
     with engine.begin() as conn:
         rows = conn.execute(
@@ -199,10 +199,11 @@ def semantic_search(query: str, top_k: int = 5) -> list:
                 SELECT source_file, content,
                        1 - (embedding <=> CAST(:e AS vector)) AS similarity
                 FROM document_embeddings
+                WHERE 1 - (embedding <=> CAST(:e AS vector)) >= :threshold
                 ORDER BY embedding <=> CAST(:e AS vector)
                 LIMIT :k
             """),
-            {"e": str(query_embedding), "k": top_k}
+            {"e": str(query_embedding), "k": top_k, "threshold": min_similarity}
         ).mappings().all()
 
     return [

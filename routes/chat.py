@@ -35,8 +35,8 @@ Customer Service Persib Bandung. Anda juga dapat menghubungi CS kami secara
 langsung melalui jalur resmi yang tersedia. Terima kasih atas kesabaran Anda!"""
 )
 
-SIMILARITY_THRESHOLD = 0.80
-RAG_TOP_K = 7
+SIMILARITY_THRESHOLD = 0.70
+RAG_TOP_K = 5
 
 class QueryRequest(BaseModel):
     query: str = Field(
@@ -457,12 +457,17 @@ Pertanyaan user: '{query}'"""
             answer = ""
 
         else:
-            search_results = semantic_search_api(query, top_k=RAG_TOP_K)
-            context = "\n\n".join(
-                f"[Sumber: {r['source']}]\n{r['content']}"
-                for r in search_results
-            )
-            prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
+            search_results = semantic_search_api(query, top_k=RAG_TOP_K, min_similarity=SIMILARITY_THRESHOLD)
+
+            if not search_results:
+                fallback = True
+                answer = ""
+            else:
+                context = "\n\n".join(
+                    f"[Sumber: {r['source']}]\n{r['content']}"
+                    for r in search_results
+                )
+                prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah dan helpful.
 {LANGUAGE_INSTRUCTION}
 Gunakan HANYA informasi dari konteks berikut untuk menjawab.
 Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu.
@@ -475,8 +480,8 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan: {query}
 Jawaban:"""
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+                response = llm.invoke([HumanMessage(content=prompt)])
+                answer = response.content.strip()
 
         # ==========================================
         # PENYELESAIAN & PENYIMPANAN

@@ -7,6 +7,7 @@ router = APIRouter()
 class SearchRequest(BaseModel):
     query: str
     top_k: int = 5
+    min_similarity: float = 0.70
 
 @router.post("/search/semantic")
 def semantic_search_endpoint(req: SearchRequest):
@@ -14,6 +15,7 @@ def semantic_search_endpoint(req: SearchRequest):
     return {
         "query": req.query,
         "top_k": req.top_k,
+        "min_similarity": req.min_similarity,
         "results": results
     }
 
