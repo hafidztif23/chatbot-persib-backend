@@ -81,13 +81,6 @@ def chat(
     account: dict = Depends(get_current_account)
 ):
     """Chat endpoint utama MaungBot."""
-    # Shadow LANGUAGE_INSTRUCTION dynamically based on user's referensi_generate setting
-    ref_generate = account.get("referensi_generate", 1)
-    if ref_generate == 2:
-        LANGUAGE_INSTRUCTION = "Always answer in natural, friendly, and helpful English. Keep the tone warm and easy to understand."
-    else:
-        LANGUAGE_INSTRUCTION = globals()["LANGUAGE_INSTRUCTION"]
-
     try:
         query      = req.query
         id_account = account["id_account"]

@@ -109,14 +109,7 @@ function Login() {
             </button>
           </form>
 
-          <div className="auth-divider">
-            <span>Or</span>
-          </div>
 
-          <button className="google-btn">
-            <span className="google-icon">G</span>
-            Register with Google
-          </button>
 
           <p className="auth-footer">
             Don't have an Account? <a href="/signup">Sign up</a>

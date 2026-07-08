@@ -18,13 +18,11 @@ const TRANSLATIONS = {
     save_success: "Pengaturan berhasil disimpan!",
     card_language: "Bahasa",
     system_lang: "Bahasa Sistem",
-    gen_lang: "Bahasa Generasi",
     card_tone: "Nada Bicara",
     tone_style: "Gaya Bahasa",
     formality_level: "Tingkat Formalitas",
     card_notifications: "Notifikasi",
     enable_notifications: "Aktifkan Notifikasi",
-    gen_lang_otomatis: "Otomatis (Indo/English/Sunda)",
 
     // Chatbot Page
     chatbot_welcome: "Mulai obrolan baru dengan Maung Chat",
@@ -54,13 +52,11 @@ const TRANSLATIONS = {
     save_success: "Settings saved successfully!",
     card_language: "Language",
     system_lang: "System Language",
-    gen_lang: "Generation Language",
     card_tone: "Tone",
     tone_style: "Tone Style",
     formality_level: "Formality Level",
     card_notifications: "Notifications",
     enable_notifications: "Enable Notifications",
-    gen_lang_otomatis: "Automatic (Indo/English/Sunda)",
 
     // Chatbot Page
     chatbot_welcome: "Start a new chat with Maung Chat",

@@ -3,27 +3,24 @@ import CustomSelect from "../common/CustomSelect";
 import { useAuth } from "../../hooks/useAuth";
 import { getTranslation } from "../../utils/translation";
 
-const SYSTEM_LANGUAGE_OPTIONS = ["English", "Indonesia"];
+const THEME_OPTIONS = ["Dark", "Sun"];
 
-function LanguageCard({
-  systemLanguage,
-  setSystemLanguage,
-}) {
+function ThemeCard({ theme, setTheme }) {
   const { user } = useAuth();
   const t = getTranslation(user?.referensi_bahasa);
 
   return (
-    <Card title={t.card_language}>
+    <Card title="Theme">
       <div className="settings-row">
-        <span>{t.system_lang}</span>
+        <span>SELECT THEME</span>
         <CustomSelect
-          value={systemLanguage}
-          options={SYSTEM_LANGUAGE_OPTIONS}
-          onChange={(e) => setSystemLanguage(e.target.value)}
+          value={theme}
+          options={THEME_OPTIONS}
+          onChange={(e) => setTheme(e.target.value)}
         />
       </div>
     </Card>
   );
 }
 
-export default LanguageCard;
+export default ThemeCard;
