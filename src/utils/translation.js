@@ -24,6 +24,7 @@ const TRANSLATIONS = {
     formality_level: "Tingkat Formalitas",
     card_notifications: "Notifikasi",
     enable_notifications: "Aktifkan Notifikasi",
+    gen_lang_otomatis: "Otomatis (Indo/English/Sunda)",
 
     // Chatbot Page
     chatbot_welcome: "Mulai obrolan baru dengan Maung Chat",
@@ -59,6 +60,7 @@ const TRANSLATIONS = {
     formality_level: "Formality Level",
     card_notifications: "Notifications",
     enable_notifications: "Enable Notifications",
+    gen_lang_otomatis: "Automatic (Indo/English/Sunda)",
 
     // Chatbot Page
     chatbot_welcome: "Start a new chat with Maung Chat",

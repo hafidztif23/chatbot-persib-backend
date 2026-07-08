@@ -22,7 +22,7 @@ function Settings() {
     user?.referensi_bahasa === 2 ? "English" : "Indonesia"
   );
   const [generationLanguage, setGenerationLanguage] = useState(
-    user?.referensi_generate === 2 ? "English" : "Indonesia"
+    user?.referensi_generate === 2 ? "English" : "Otomatis"
   );
 
   const [tone, setTone] = useState(() => 
@@ -36,7 +36,7 @@ function Settings() {
   useEffect(() => {
     if (user) {
       setSystemLanguage(user.referensi_bahasa === 2 ? "English" : "Indonesia");
-      setGenerationLanguage(user.referensi_generate === 2 ? "English" : "Indonesia");
+      setGenerationLanguage(user.referensi_generate === 2 ? "English" : "Otomatis");
     }
   }, [user]);
 
