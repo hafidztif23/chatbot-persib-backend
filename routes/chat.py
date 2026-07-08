@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, Field
 from langchain_core.messages import HumanMessage
 from core.config import CHATBOT_NAME, LANGUAGE_INSTRUCTION
 from core.intents import detect_intent, extract_lawan, extract_nama_pemain, extract_posisi, extract_status_pemain, extract_tribun
@@ -39,15 +39,18 @@ SIMILARITY_THRESHOLD = 0.80
 RAG_TOP_K = 7
 
 class QueryRequest(BaseModel):
-    query: str
+    query: str = Field(
+        ..., 
+        max_length=500, 
+        min_length=1, 
+        description="Input pertanyaan dari user, maksimal 500 karakter."
+    )
 
     @field_validator("query")
     @classmethod
-    def validate_query(cls, v: str) -> str:
-        if not v or not v.strip():
+    def validate_spaces(cls, v: str) -> str:
+        if not v.strip():
             raise ValueError("Pertanyaan tidak boleh kosong atau hanya spasi.")
-        if len(v.strip()) > 500:
-            raise ValueError("Pertanyaan tidak boleh melebihi 500 karakter.")
         return v.strip()
 
 def is_first_message(id_account: int) -> bool:

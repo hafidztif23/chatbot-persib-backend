@@ -191,7 +191,7 @@ def store_embeddings_from_docs(force: bool = False):
 # SEMANTIC SEARCH (tidak berubah)
 # ──────────────────────────────────────────────
 
-def semantic_search(query: str, top_k: int = 3) -> list:
+def semantic_search(query: str, top_k: int = 5) -> list:
     query_embedding = embed_text(query)
     with engine.begin() as conn:
         rows = conn.execute(

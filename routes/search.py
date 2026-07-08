@@ -6,7 +6,7 @@ router = APIRouter()
 
 class SearchRequest(BaseModel):
     query: str
-    top_k: int = 3
+    top_k: int = 5
 
 @router.post("/search/semantic")
 def semantic_search_endpoint(req: SearchRequest):
