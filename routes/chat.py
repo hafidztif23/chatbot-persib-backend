@@ -66,6 +66,14 @@ def _escalate(id_account: int, query: str) -> None:
     except Exception as exc:
         print(f"[ESKALASI ERROR] id_account={id_account} | {exc}")
 
+def _safe_llm_invoke(messages) -> tuple[str, bool]:
+    try:
+        response = llm.invoke(messages)
+        return response.content.strip(), False
+    except Exception as e:
+        print(f"[LLM ERROR] HuggingFace API gagal: {type(e).__name__}: {e}")
+        return "", True
+
 
 @router.post("/chat")
 def chat(
@@ -132,8 +140,9 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         # INTENT: Stok tiket terdekat (DB)
         elif intent == "stok_tiket":
@@ -174,8 +183,9 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         # INTENT: Stok tiket by lawan (DB)
         elif intent == "stok_tiket_by_jadwal":
@@ -216,8 +226,9 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         # INTENT: Jadwal terdekat (DB)
         elif intent == "info_jadwal_terdekat":
@@ -240,8 +251,9 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         # INTENT: Jadwal by lawan (DB)
         elif intent == "info_jadwal":
@@ -272,8 +284,9 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         # INTENT: Info pemain by nama (DB)
         elif intent == "info_pemain":
@@ -299,8 +312,9 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         # INTENT: Pemain by posisi (DB)
         elif intent == "info_pemain_posisi":
@@ -323,8 +337,9 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         # INTENT: Pemain by status (DB)
         elif intent == "info_pemain_status":
@@ -347,8 +362,9 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         # ROUTING: CONVERSATIONAL (LLM only, no DB, no RAG)
         elif intent == "greeting":
@@ -369,8 +385,9 @@ Tanyakan apa yang bisa kamu bantu.
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         elif intent == "farewell":
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
@@ -380,8 +397,9 @@ Sampaikan bahwa kamu siap membantu kapan saja jika butuh informasi tentang Persi
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         elif intent == "thanks":
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME} yang ramah.
@@ -390,8 +408,9 @@ Balas ucapan terima kasih dari {account['nama_lengkap']} dengan hangat dan sopan
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         elif intent == "tentang_chatbot":
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
@@ -406,8 +425,9 @@ Pertanyaan user: '{query}'"""
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         elif intent == "bantuan":
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
@@ -422,8 +442,9 @@ Berikan contoh pertanyaan seperti:
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         elif intent == "konfirmasi_positif":
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
@@ -435,8 +456,9 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         elif intent == "konfirmasi_negatif":
             prompt = f"""Kamu adalah asisten virtual Persib Bandung bernama {CHATBOT_NAME}.
@@ -448,8 +470,9 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan user: '{query}'"""
 
-            response = llm.invoke([HumanMessage(content=prompt)])
-            answer = response.content.strip()
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
 
         # INTENT: Eskalasi eksplisit — user sendiri yang minta dihubungkan ke CS
         elif intent == "fallback_eskalasi":
@@ -480,8 +503,9 @@ Riwayat percakapan sebelumnya:
 
 Pertanyaan: {query}
 Jawaban:"""
-                response = llm.invoke([HumanMessage(content=prompt)])
-                answer = response.content.strip()
+                answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+                if llm_failed:
+                    fallback = True
 
         # ==========================================
         # PENYELESAIAN & PENYIMPANAN
