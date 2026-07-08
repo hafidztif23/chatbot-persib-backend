@@ -44,7 +44,7 @@ def get_all_eskalasi(
     base_query = """
         SELECT
             e.id_fallback,
-            e.id_account,
+            ch.session_id AS id_account,
             a.nama_lengkap,
             a.email,
             e.id_history,
@@ -54,8 +54,8 @@ def get_all_eskalasi(
             e.created_at,
             e.answered_at
         FROM eskalasi e
-        JOIN accounts      a  ON a.id_account  = e.id_account
         JOIN chat_history  ch ON ch.id          = e.id_history
+        JOIN accounts      a  ON a.id_account   = ch.session_id
     """
     params = {}
     if status:
@@ -81,7 +81,7 @@ def get_eskalasi_by_id(id_fallback: int):
             text("""
                 SELECT
                     e.id_fallback,
-                    e.id_account,
+                    ch.session_id AS id_account,
                     a.nama_lengkap,
                     a.email,
                     e.id_history,
@@ -91,8 +91,8 @@ def get_eskalasi_by_id(id_fallback: int):
                     e.created_at,
                     e.answered_at
                 FROM eskalasi e
-                JOIN accounts      a  ON a.id_account = e.id_account
-                JOIN chat_history  ch ON ch.id         = e.id_history
+                JOIN chat_history  ch ON ch.id          = e.id_history
+                JOIN accounts      a  ON a.id_account   = ch.session_id
                 WHERE e.id_fallback = :id_fallback
             """),
             {"id_fallback": id_fallback}
@@ -115,7 +115,7 @@ def get_my_eskalasi(account: dict = Depends(get_current_account)):
             text("""
                 SELECT
                     e.id_fallback,
-                    e.id_account,
+                    ch.session_id AS id_account,
                     e.id_history,
                     ch.content,
                     e.jawaban,
@@ -124,7 +124,7 @@ def get_my_eskalasi(account: dict = Depends(get_current_account)):
                     e.answered_at
                 FROM eskalasi e
                 JOIN chat_history ch ON ch.id = e.id_history
-                WHERE e.id_account = :id_account
+                WHERE ch.session_id = :id_account
                 ORDER BY e.created_at DESC
             """),
             {"id_account": account["id_account"]}

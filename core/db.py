@@ -290,7 +290,7 @@ def get_stok_tiket_by_lawan(nama_lawan: str):
 
     return get_stok_tiket(row["id_jadwal"])
 
-def create_eskalasi(id_account: int, id_history: int) -> int:
+def create_eskalasi(id_history: int) -> int:
     """
     Simpan satu tiket eskalasi ke tabel eskalasi.
     Mengembalikan id_fallback yang baru dibuat.
@@ -299,11 +299,11 @@ def create_eskalasi(id_account: int, id_history: int) -> int:
     with engine.begin() as conn:
         result = conn.execute(
             text("""
-                INSERT INTO eskalasi (id_account, id_history)
-                VALUES (:id_account, :id_history)
+                INSERT INTO eskalasi (id_history)
+                VALUES (:id_history)
                 RETURNING id_fallback
             """),
-            {"id_account": id_account, "id_history": id_history}
+            {"id_history": id_history}
         )
         return result.fetchone()[0]
  

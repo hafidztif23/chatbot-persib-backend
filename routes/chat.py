@@ -62,7 +62,7 @@ def _escalate(id_account: int, query: str) -> None:
     try:
         id_history = get_last_human_history_id(id_account)
         if id_history:
-            create_eskalasi(id_account=id_account, id_history=id_history)
+            create_eskalasi(id_history=id_history)
     except Exception as exc:
         print(f"[ESKALASI ERROR] id_account={id_account} | {exc}")
 
