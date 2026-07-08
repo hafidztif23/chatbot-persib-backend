@@ -109,13 +109,16 @@ def chat(
         # INTENT: Cek Merchandise (DB)
         if intent in item_map:
             item_name = item_map[intent]
-            stock = get_merch_stock(item_name)
+            merch_info = get_merch_stock(item_name)
 
-            if stock is not None:
+            if merch_info is not None:
+                stock = merch_info["stock"]
+                harga = merch_info["harga"]
+                harga_str = f"Rp {harga:,}".replace(",", ".")
                 prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
 Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
-Data: Merchandise {item_name}, Stok saat ini: {stock} pcs.
-Jawaban harus ramah dan langsung memberikan jumlah stok.
+Data: Merchandise {item_name}, Stok saat ini: {stock} pcs, Harga: {harga_str}.
+Jawaban harus ramah dan langsung memberikan jumlah stok serta harganya.
 {LANGUAGE_INSTRUCTION}
 
 Riwayat percakapan sebelumnya:
@@ -146,12 +149,12 @@ Pertanyaan user: '{query}'"""
                 if nama_tribun:
                     tribun_filter = [t for t in data["tribun"] if t["nama_tribun"] == nama_tribun]
                     detail_tribun = (
-                        f"- {tribun_filter[0]['nama_tribun']}: {tribun_filter[0]['stok']:,} tiket"
+                        f"- {tribun_filter[0]['nama_tribun']}: {tribun_filter[0]['stok']:,} tiket (Harga: Rp {tribun_filter[0]['harga_tiket']:,})".replace(",", ".")
                         if tribun_filter else f"Data tribun '{nama_tribun}' tidak ditemukan."
                     )
                 else:
                     detail_tribun = "\n".join(
-                        f"- {t['nama_tribun']}: {t['stok']:,} tiket"
+                        f"- {t['nama_tribun']}: {t['stok']:,} tiket (Harga: Rp {t['harga_tiket']:,})".replace(",", ".")
                         for t in data["tribun"]
                     )
 
@@ -190,12 +193,12 @@ Pertanyaan user: '{query}'"""
                 if nama_tribun:
                     tribun_filter = [t for t in data["tribun"] if t["nama_tribun"] == nama_tribun]
                     detail_tribun = (
-                        f"- {tribun_filter[0]['nama_tribun']}: {tribun_filter[0]['stok']:,} tiket"
+                        f"- {tribun_filter[0]['nama_tribun']}: {tribun_filter[0]['stok']:,} tiket (Harga: Rp {tribun_filter[0]['harga_tiket']:,})".replace(",", ".")
                         if tribun_filter else f"Data tribun '{nama_tribun}' tidak ditemukan."
                     )
                 else:
                     detail_tribun = "\n".join(
-                        f"- {t['nama_tribun']}: {t['stok']:,} tiket"
+                        f"- {t['nama_tribun']}: {t['stok']:,} tiket (Harga: Rp {t['harga_tiket']:,})".replace(",", ".")
                         for t in data["tribun"]
                     )
 

@@ -6,7 +6,10 @@ def get_merch_stock(item_name: str):
     data = response.json()
     for item in data.get("merchandise", []):
         if item["name"].lower() == item_name.lower():
-            return item["stock"]
+            return {
+                "stock": item["stock"],
+                "harga": item.get("harga_merchandise") or 0
+            }
     return None
 
 def get_jadwal_terdekat():

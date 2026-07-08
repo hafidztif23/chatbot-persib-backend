@@ -38,17 +38,19 @@ def is_already_embedded(file_name: str, file_hash: str) -> bool:
     return bool(row and row[0] == file_hash)
 
 
-def update_tracker(file_name: str, file_hash: str):
+def update_tracker(file_name: str, file_hash: str) -> int:
     with engine.begin() as conn:
-        conn.execute(
+        row = conn.execute(
             text("""
                 INSERT INTO docs_embedding_tracker (file_name, file_hash, last_embedded)
                 VALUES (:n, :h, NOW())
                 ON CONFLICT (file_name) DO UPDATE
                 SET file_hash = :h, last_embedded = NOW()
+                RETURNING id_docs_tracker
             """),
             {"n": file_name, "h": file_hash}
-        )
+        ).fetchone()
+        return row[0]
 
 
 def remove_tracker(file_name: str):
@@ -149,6 +151,8 @@ def embed_single_file_from_bytes(file_name: str, file_bytes: bytes, force: bool 
     chunks = chunk_text(content, chunk_size=config["chunk_size"], overlap=config["overlap"])
     print(f"  → chunk_size={config['chunk_size']}, overlap={config['overlap']}, total={len(chunks)} chunks")
 
+    id_docs_tracker = update_tracker(file_name, file_hash)
+
     with engine.begin() as conn:
         conn.execute(
             text("DELETE FROM document_embeddings WHERE source_file = :s"),
@@ -158,13 +162,18 @@ def embed_single_file_from_bytes(file_name: str, file_bytes: bytes, force: bool 
             embedding = embed_text(chunk)
             conn.execute(
                 text("""
-                    INSERT INTO document_embeddings (source_file, chunk_index, content, embedding)
-                    VALUES (:s, :i, :c, :e)
+                    INSERT INTO document_embeddings (source_file, chunk_index, content, embedding, id_docs_tracker)
+                    VALUES (:s, :i, :c, :e, :id_tracker)
                 """),
-                {"s": file_name, "i": idx, "c": chunk, "e": str(embedding)}
+                {
+                    "s": file_name,
+                    "i": idx,
+                    "c": chunk,
+                    "e": str(embedding),
+                    "id_tracker": id_docs_tracker
+                }
             )
 
-    update_tracker(file_name, file_hash)
     print(f"[OK] {file_name} → {len(chunks)} chunks disimpan")
 
 

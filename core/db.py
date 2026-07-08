@@ -224,7 +224,7 @@ def get_stok_tiket(id_jadwal: int):
     with engine.connect() as conn:
         rows = conn.execute(
             text("""
-                SELECT t.nama_tribun, t.stok, j.lawan, j.tanggal_jam, j.status_pertandingan
+                SELECT t.nama_tribun, t.stok, t.harga_tiket, j.lawan, j.tanggal_jam, j.status_pertandingan
                 FROM ticket t
                 JOIN jadwal_pertandingan j ON t.id_jadwal = j.id_jadwal
                 WHERE t.id_jadwal = :id_jadwal
@@ -243,7 +243,11 @@ def get_stok_tiket(id_jadwal: int):
         "tanggal_jam": first["tanggal_jam"].strftime("%d %B %Y, %H:%M WIB"),
         "status_pertandingan": first["status_pertandingan"],
         "tribun": [
-            {"nama_tribun": r["nama_tribun"], "stok": r["stok"]}
+            {
+                "nama_tribun": r["nama_tribun"], 
+                "stok": r["stok"], 
+                "harga_tiket": r.get("harga_tiket") or 0
+            }
             for r in rows
         ],
         "total_stok": sum(r["stok"] for r in rows)
