@@ -31,7 +31,7 @@ const TRANSLATIONS = {
     suggested_q1: "Siapa top skorer Persib musim ini?",
     suggested_q2: "Bagaimana regulasi Stadion GBLA",
     suggested_q3: "Kapan jadwal Persib vs Persija?",
-    suggested_q4: "Tips bertahan ala Robby Darwin",
+    suggested_q4: "Stok Merchandise Persib Bandung",
   },
   // English (referensi_bahasa = 2)
   2: {
@@ -65,7 +65,7 @@ const TRANSLATIONS = {
     suggested_q1: "Who is Persib's top scorer this season?",
     suggested_q2: "Regulation of GBLA Stadium",
     suggested_q3: "When is Persib vs Persija match?",
-    suggested_q4: "Defending tips like Robby Darwin",
+    suggested_q4: "How Many Stock Merchandise Persib Bandung",
   }
 };
 
