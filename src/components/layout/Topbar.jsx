@@ -13,8 +13,6 @@ function Topbar({ toggleSidebar }) {
       </div>
 
       <div className="topbar-right">
-        <button className="topbar-icon">💬</button>
-        <button className="topbar-icon">🛡️</button>
       </div>
     </header>
   );

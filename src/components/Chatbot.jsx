@@ -193,7 +193,7 @@ function Chatbot() {
               <img src={PersibLogo} alt="Persib Logo" className="cb-persib-logo" />
             </div>
             <h1 className="cb-welcome-title">
-              {user?.referensi_bahasa === 2 ? "Start a new chat with " : "Mulai obrolan baru dengan "}
+              {user?.referensi_bahasa === "eng" ? "Start a new chat with " : "Mulai obrolan baru dengan "}
               <span className="cb-highlight">Maung Chat</span>
             </h1>
             <p className="cb-welcome-subtitle">{t.chatbot_subtitle}</p>

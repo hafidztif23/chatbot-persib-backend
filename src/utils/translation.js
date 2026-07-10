@@ -1,6 +1,6 @@
 const TRANSLATIONS = {
-  // Indonesian (default, referensi_bahasa = 1)
-  1: {
+  // Indonesian (default, referensi_bahasa = 'ind')
+  ind: {
     // Sidebar
     new_chat: "Obrolan Baru",
     menu_utama: "MENU UTAMA",
@@ -33,8 +33,8 @@ const TRANSLATIONS = {
     suggested_q3: "Kapan jadwal Persib vs Persija?",
     suggested_q4: "Stok Merchandise Persib Bandung",
   },
-  // English (referensi_bahasa = 2)
-  2: {
+  // English (referensi_bahasa = 'eng')
+  eng: {
     // Sidebar
     new_chat: "New Chat",
     menu_utama: "MAIN MENU",
@@ -70,6 +70,6 @@ const TRANSLATIONS = {
 };
 
 export const getTranslation = (langCode) => {
-  const code = langCode === 2 ? 2 : 1;
+  const code = langCode === "eng" ? "eng" : "ind";
   return TRANSLATIONS[code];
 };

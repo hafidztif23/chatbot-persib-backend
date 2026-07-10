@@ -12,9 +12,9 @@ function Settings() {
   const { user, updateUser } = useAuth();
   const t = getTranslation(user?.referensi_bahasa);
 
-  // Baca pengaturan dari user profil database (default: 1 -> Indonesia, 2 -> English)
+  // Baca pengaturan dari user profil database (default: 'ind' -> Indonesia, 'eng' -> English)
   const [systemLanguage, setSystemLanguage] = useState(
-    user?.referensi_bahasa === 2 ? "English" : "Indonesia"
+    user?.referensi_bahasa === "eng" ? "English" : "Indonesia"
   );
 
   const [theme, setTheme] = useState(() => 
@@ -24,13 +24,13 @@ function Settings() {
   // Update local states jika data user berubah (misal baru login atau data sync)
   useEffect(() => {
     if (user) {
-      setSystemLanguage(user.referensi_bahasa === 2 ? "English" : "Indonesia");
+      setSystemLanguage(user.referensi_bahasa === "eng" ? "English" : "Indonesia");
     }
   }, [user]);
 
   const handleSave = async () => {
     try {
-      const ref_bahasa = systemLanguage === "English" ? 2 : 1;
+      const ref_bahasa = systemLanguage === "English" ? "eng" : "ind";
 
       // 1. Simpan ke database backend
       await authAPI.updateProfile({

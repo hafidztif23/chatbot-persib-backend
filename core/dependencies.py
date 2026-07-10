@@ -44,7 +44,7 @@ def get_current_account(
             text("""
                 SELECT id_account, nama_lengkap, nik, email, nomor_telepon,
                        tanggal_lahir, jenis_kelamin, kota, membership, role, created_at,
-                       referensi_bahasa, referensi_generate
+                       referensi_bahasa
                 FROM accounts
                 WHERE id_account = :id_account
             """),
