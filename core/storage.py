@@ -5,7 +5,7 @@ from typing import Optional
 from google.cloud import storage
 
 BUCKET_NAME = os.getenv("GCS_BUCKET_NAME", "maungbot-docs")
-SUPPORTED_EXT = {".txt", ".pdf", ".xlsx", ".xls", ".docx"}
+SUPPORTED_EXT = {".txt", ".pdf", ".docx"}
 
 
 def _get_client() -> storage.Client:

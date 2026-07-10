@@ -67,7 +67,6 @@ dan terdiri dari dua bagian utama dalam satu repository:
 │   ├── ticket.py
 │   ├── eskalasi.py
 │   └── ...
-├── docs/                 # Knowledge base (PDF/DOCX/TXT) untuk RAG
 ├── intents.json          # Definisi intent & contoh kalimat
 ├── main.py                # Entry point backend (FastAPI)
 ├── requirements.txt       # Dependencies backend
@@ -127,13 +126,13 @@ Variabel utama yang dibutuhkan frontend:
 
 ## Knowledge Base & RAG
 
-Dokumen sumber (PDF/DOCX/TXT/XLSX) ditempatkan pada folder `docs/`. Saat
+Dokumen sumber (PDF/DOCX/TXT) ditempatkan pada Google Cloud Storage. Saat
 backend dijalankan:
 
 1. Dokumen disinkronkan dari Google Cloud Storage (`core/storage.py`)
 2. Setiap dokumen di-chunk dan diubah menjadi embedding (`core/embeddings.py`)
 3. Embedding disimpan ke tabel `document_embeddings` (PostgreSQL + pgvector)
-4. `core/docs_watcher.py` memantau folder `docs/` untuk update otomatis saat
+4. `core/docs_watcher.py` memantau folder Cloud Storage untuk update otomatis saat
    ada file baru, berubah, atau dihapus
 
 ## Deployment

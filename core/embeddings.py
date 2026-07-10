@@ -7,7 +7,7 @@ from core.db import engine
 
 emb_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-SUPPORTED_EXT = {".txt", ".pdf", ".xlsx", ".xls", ".docx"}
+SUPPORTED_EXT = {".txt", ".pdf", ".docx"}
 
 FILE_CHUNK_CONFIG = {
     "sejarah.txt":                    {"chunk_size": 500,  "overlap": 50},
@@ -77,19 +77,6 @@ def _load_pdf_bytes(data: bytes) -> str:
     )
 
 
-def _load_excel_bytes(data: bytes) -> str:
-    import openpyxl
-    wb = openpyxl.load_workbook(io.BytesIO(data), data_only=True)
-    result = []
-    for sheet in wb.worksheets:
-        result.append(f"[Sheet: {sheet.title}]")
-        for row in sheet.iter_rows(values_only=True):
-            row_text = " | ".join(str(c) for c in row if c is not None)
-            if row_text.strip():
-                result.append(row_text)
-    return "\n".join(result)
-
-
 def _load_docx_bytes(data: bytes) -> str:
     from docx import Document as DocxDocument
     doc = DocxDocument(io.BytesIO(data))
@@ -101,8 +88,6 @@ def load_file_from_bytes(file_name: str, data: bytes) -> str:
     loaders = {
         ".txt":  _load_txt_bytes,
         ".pdf":  _load_pdf_bytes,
-        ".xlsx": _load_excel_bytes,
-        ".xls":  _load_excel_bytes,
         ".docx": _load_docx_bytes,
     }
     if ext not in loaders:

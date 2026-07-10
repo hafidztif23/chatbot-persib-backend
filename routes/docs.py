@@ -7,7 +7,7 @@ from core.dependencies import get_current_admin
 
 router = APIRouter(prefix="/documents", tags=["documents"], dependencies=[Depends(get_current_admin)])
 
-SUPPORTED_EXT = {".txt", ".pdf", ".xlsx", ".xls", ".docx"}
+SUPPORTED_EXT = {".txt", ".pdf", ".docx"}
 
 
 @router.get("")
