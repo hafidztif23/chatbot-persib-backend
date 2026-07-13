@@ -17,7 +17,7 @@ from core.api_client import (
     get_stok_tiket_terdekat,
     get_stok_tiket_by_lawan
 )
-from core.db import create_eskalasi, get_last_human_history_id
+from core.db import create_eskalasi, get_all_merch, get_last_human_history_id
 
 router = APIRouter()
 
@@ -140,7 +140,34 @@ Pertanyaan user: '{query}'"""
             if llm_failed:
                 fallback = True
 
-        # INTENT: Stok tiket terdekat (DB)
+        elif intent == "stok_merchandise":
+            all_merch = get_all_merch()
+
+            if all_merch:
+                detail_merch = "\n".join(
+                    f"- {m['name']}: stok {m['stock']} pcs, "
+                    f"harga Rp {m['harga']:,}".replace(",", ".")
+                    for m in all_merch
+                )
+                konteks = f"Daftar merchandise resmi Persib Bandung:\n{detail_merch}"
+            else:
+                konteks = "Tidak ada data merchandise yang tersedia saat ini."
+
+            prompt = f"""Kamu adalah asisten Persib Bandung bernama {CHATBOT_NAME} yang ramah, singkat, dan natural.
+{LANGUAGE_INSTRUCTION}
+Gunakan hanya informasi berikut untuk menjawab pertanyaan user.
+
+{konteks}
+
+Riwayat percakapan sebelumnya:
+{history_text}
+
+Pertanyaan user: '{query}'"""
+
+            answer, llm_failed = _safe_llm_invoke([HumanMessage(content=prompt)])
+            if llm_failed:
+                fallback = True
+        
         elif intent == "stok_tiket":
             nama_tribun = extract_tribun(query)
             data = get_stok_tiket_terdekat()

@@ -2,15 +2,34 @@ import httpx
 from core.config import API_BASE_URL
 
 def get_merch_stock(item_name: str):
+    item_name = item_name.strip().title()
+    
+    response = httpx.get(f"{API_BASE_URL}/merchandise", params={"name": item_name})
+    data = response.json()
+    
+    merch_list = data.get("merchandise", [])
+    
+    if merch_list:
+        item = merch_list[0]
+        return {
+            "stock": item["stock"],
+            "harga": item.get("harga_merchandise") or 0
+        }
+        
+    return None
+
+def get_all_merch():
     response = httpx.get(f"{API_BASE_URL}/merchandise")
     data = response.json()
-    for item in data.get("merchandise", []):
-        if item["name"].lower() == item_name.lower():
-            return {
-                "stock": item["stock"],
-                "harga": item.get("harga_merchandise") or 0
-            }
-    return None
+    
+    return [
+        {
+            "name": item["name"],
+            "stock": item["stock"],
+            "harga": item.get("harga_merchandise") or 0
+        }
+        for item in data.get("merchandise", [])
+    ]
 
 def get_jadwal_terdekat():
     response = httpx.get(f"{API_BASE_URL}/jadwal/terdekat")

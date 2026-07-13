@@ -41,15 +41,34 @@ else:
     print("⚠ Menggunakan SQLite (development)")
 
 def check_merch_stock(item_name: str):
+    """Ambil stok merchandise langsung dari DB."""
     item_name = item_name.strip().title()
     with engine.connect() as conn:
-        row = conn.execute(
-            text("SELECT stock FROM merchandise WHERE name = :name"),
+        rows = conn.execute(
+            text("SELECT name, stock, harga_merchandise FROM merchandise WHERE name = :name"),
             {"name": item_name}
         ).mappings().fetchone()
-        if row:
-            return row['stock']
-        return None
+    if rows:
+        return {
+            "stock": rows["stock"],
+            "harga": rows.get("harga_merchandise") or 0
+            }
+    return None
+    
+def get_all_merch() -> list:
+    """Ambil semua merchandise dari DB."""
+    with engine.connect() as conn:
+        rows = conn.execute(
+            text("SELECT name, stock, harga_merchandise FROM merchandise")
+        ).mappings().all()
+    return [
+        {
+            "name": row["name"],
+            "stock": row["stock"],
+            "harga": row.get("harga_merchandise") or 0
+        }
+        for row in rows
+    ]
     
 def get_jadwal_pertandingan(status: str = None):
     """Ambil semua jadwal, bisa difilter by status"""

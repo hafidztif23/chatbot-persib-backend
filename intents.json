@@ -218,13 +218,29 @@
     ]
   },
   {
+    "intent": "stok_merchandise",
+    "examples": [
+      "Stok merchandise Persib Bandung",
+      "Ada merchandise apa saja di Persib?",
+      "Cek semua stok merchandise Persib",
+      "Merchandise Persib apa yang tersedia?",
+      "Daftar merchandise resmi Persib",
+      "Ada apa aja yang dijual Persib?",
+      "Produk Persib apa yang ada stoknya?",
+      "Merchandise Persib ready stock apa aja?",
+      "Mau lihat semua produk Persib yang ada",
+      "Info stok semua merchandise Persib dong"
+    ]
+  },
+  {
     "intent": "stok_tiket",
     "examples": [
       "Sisa tiket pertandingan Persib masih berapa?",
       "Stok tiket tribun timur Persib masih ada?",
       "Tiket VIP Persib masih tersedia tidak?",
       "Berapa sisa tiket buat nonton Persib?",
-      "Cek dong stok tiket pertandingan Persib terdekat"
+      "Cek dong stok tiket pertandingan Persib terdekat",
+      "Tiket persib masih ada?"
     ]
   },
   {
