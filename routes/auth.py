@@ -58,9 +58,11 @@ class LoginRequest(BaseModel):
 
 class UpdateProfileRequest(BaseModel):
     nama_lengkap:  Optional[str]  = None
+    email: Optional[str] = None
     nomor_telepon: Optional[str]  = None
     tanggal_lahir: Optional[date] = None
     kota:          Optional[str]  = None
+    password: Optional[str] = None
     referensi_bahasa: Optional[str] = None
 
     @field_validator("nomor_telepon")
@@ -192,12 +194,27 @@ def update_profile(
 ):
     """Update sebagian field profil (nama, telepon, tanggal lahir, kota)."""
 
+    if data.email is not None and data.email != account.get("email"):
+        with engine.connect() as conn:  # Pastikan membuka koneksi untuk SELECT
+            if conn.execute(
+                text("SELECT 1 FROM accounts WHERE email = :email"),
+                {"email": data.email},
+            ).fetchone():
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Email sudah terdaftar.",
+                )
+
     fields: dict = {}
     if data.nama_lengkap  is not None: fields["nama_lengkap"]  = data.nama_lengkap
+    if data.email         is not None: fields["email"]         = data.email
     if data.nomor_telepon is not None: fields["nomor_telepon"] = data.nomor_telepon
     if data.tanggal_lahir is not None: fields["tanggal_lahir"] = data.tanggal_lahir
     if data.kota          is not None: fields["kota"]          = data.kota
-    if data.referensi_bahasa   is not None: fields["referensi_bahasa"]   = data.referensi_bahasa
+    if data.referensi_bahasa is not None: fields["referensi_bahasa"] = data.referensi_bahasa
+    
+    if data.password is not None: 
+        fields["password"] = hash_password(data.password)
 
     if not fields:
         raise HTTPException(
