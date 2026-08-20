@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import LanguageCard from "../components/settings/LanguageCard";
-import ThemeCard from "../components/settings/ThemeCard";
 import Button from "../components/common/Button";
 import { useAuth } from "../hooks/useAuth";
 import { authAPI } from "../services/api";
@@ -15,10 +14,6 @@ function Settings() {
   // Baca pengaturan dari user profil database (default: 'ind' -> Indonesia, 'eng' -> English)
   const [systemLanguage, setSystemLanguage] = useState(
     user?.referensi_bahasa === "eng" ? "English" : "Indonesia"
-  );
-
-  const [theme, setTheme] = useState(() => 
-    localStorage.getItem("settings_theme") ?? "Dark"
   );
 
   // Update local states jika data user berubah (misal baru login atau data sync)
@@ -44,9 +39,6 @@ function Settings() {
       };
       updateUser(updatedUser);
 
-      // 3. Simpan setting dummy lokal lainnya (Theme)
-      localStorage.setItem("settings_theme", theme);
-
       alert(t.save_success || "Pengaturan berhasil disimpan!");
     } catch (error) {
       console.error("Gagal menyimpan pengaturan:", error);
@@ -63,10 +55,6 @@ function Settings() {
           <LanguageCard 
              systemLanguage={systemLanguage} 
              setSystemLanguage={setSystemLanguage}
-          />
-          <ThemeCard 
-             theme={theme} 
-             setTheme={setTheme}
           />
         </div>
 
