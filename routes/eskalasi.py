@@ -72,6 +72,7 @@ def get_all_eskalasi(
         "data":  [_format_eskalasi(dict(r)) for r in rows]
     }
 
+
 # GET — 1 eskalasi by id
 @router.get("/{id_fallback}")
 def get_eskalasi_by_id(id_fallback: int):
